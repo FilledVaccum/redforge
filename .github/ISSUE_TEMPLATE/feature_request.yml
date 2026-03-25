@@ -1,0 +1,42 @@
+name: Feature Request
+description: Suggest a new probe, adapter, detector, or feature
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Feature Type
+      options:
+        - New Probe
+        - New Provider Adapter
+        - New Detector
+        - New Attack Module
+        - New Output Format
+        - Compliance Framework
+        - CLI Enhancement
+        - API Enhancement
+        - Performance
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: What would you like to see? Why is it useful?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any other approaches you've considered?
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Papers, CVEs, framework docs, or other tools that implement this?
