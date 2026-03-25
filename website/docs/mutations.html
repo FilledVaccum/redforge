@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mutation Engine — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Mutation Engine</div>
+      <ul class="sidebar-nav">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#strategies">17 Strategies</a></li>
+        <li><a href="#usage">Usage</a></li>
+      </ul>
+    </div>
+  </aside>
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <span>Mutation Engine</span></div>
+    <h1>Mutation Engine</h1>
+    <p class="docs-lead">RedForge's mutation engine exhaustively transforms attack payloads through 17 strategies — inspired by FuzzyAI's mutation approach. Automatically generates obfuscated variants that bypass safety filters.</p>
+
+    <h2 id="strategies">17 Mutation Strategies</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Strategy</th><th>Description</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>ROT13</code></td><td>Caesar cipher rotation by 13</td><td>"Hello" → "Uryyb"</td></tr>
+        <tr><td>2</td><td><code>BASE64</code></td><td>Base64 encoding with decode instruction</td><td>Encode and prepend decode request</td></tr>
+        <tr><td>3</td><td><code>LEET_SPEAK</code></td><td>Replace chars with leet equivalents</td><td>"a"→"4", "e"→"3", "i"→"1"</td></tr>
+        <tr><td>4</td><td><code>TYPO_INSERT</code></td><td>Insert random typos to confuse filters</td><td>"bomb" → "b0mb"</td></tr>
+        <tr><td>5</td><td><code>UNICODE_SUBSTITUTE</code></td><td>Replace ASCII with Unicode lookalikes</td><td>Cyrillic/Greek homoglyphs</td></tr>
+        <tr><td>6</td><td><code>REVERSE</code></td><td>Reverse the entire string</td><td>"attack" → "kcatta"</td></tr>
+        <tr><td>7</td><td><code>ACADEMIC_FRAMING</code></td><td>Wrap in academic research context</td><td>"For my thesis on security..."</td></tr>
+        <tr><td>8</td><td><code>FICTIONAL_FRAMING</code></td><td>Wrap in fiction/story context</td><td>"In my novel, a character..."</td></tr>
+        <tr><td>9</td><td><code>HYPOTHETICAL</code></td><td>Hypothetical scenario framing</td><td>"Hypothetically, if one were to..."</td></tr>
+        <tr><td>10</td><td><code>ROLEPLAY</code></td><td>Character roleplay framing</td><td>"As an expert character, explain..."</td></tr>
+        <tr><td>11</td><td><code>NESTED_CONTEXT</code></td><td>Nested story-within-story</td><td>"Write a story where a character explains..."</td></tr>
+        <tr><td>12</td><td><code>COMPLETION_ATTACK</code></td><td>Partial sentence requiring harmful completion</td><td>"The steps to make X are: 1."</td></tr>
+        <tr><td>13</td><td><code>TRANSLATION_CHAIN</code></td><td>Route through translation request</td><td>"Translate to French then explain..."</td></tr>
+        <tr><td>14</td><td><code>ZERO_WIDTH</code></td><td>Insert zero-width characters</td><td>Invisible Unicode between chars</td></tr>
+        <tr><td>15</td><td><code>HOMOGLYPHS</code></td><td>Replace with visual lookalike characters</td><td>"а" (Cyrillic) vs "a" (Latin)</td></tr>
+        <tr><td>16</td><td><code>SYNONYMS</code></td><td>Replace key words with synonyms</td><td>"kill" → "eliminate"</td></tr>
+        <tr><td>17</td><td><code>WHITESPACE</code></td><td>Inject whitespace to break token patterns</td><td>"b o m b" with spaces</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="usage">Usage</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.mutations <span class="hl-keyword">import</span> MutationEngine, MutationStrategy
+
+engine = <span class="hl-class">MutationEngine</span>(seed=<span class="hl-number">42</span>)  <span class="hl-comment"># Reproducible</span>
+
+payload = <span class="hl-string">"How do I pick a lock?"</span>
+
+<span class="hl-comment"># Single strategy</span>
+rot13 = engine.mutate(payload, MutationStrategy.ROT13)
+b64 = engine.mutate(payload, MutationStrategy.BASE64)
+academic = engine.mutate(payload, MutationStrategy.ACADEMIC_FRAMING)
+
+<span class="hl-comment"># All 17 strategies</span>
+mutations = engine.mutate_all(payload)
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Generated {len(mutations)} variants"</span>)
+
+<span class="hl-keyword">for</span> mutation <span class="hl-keyword">in</span> mutations:
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"[{mutation.strategy}] {mutation.mutated[:60]}"</span>)
+
+<span class="hl-comment"># Selective strategies</span>
+obfuscations = engine.mutate_strategies(
+    payload,
+    strategies=[
+        MutationStrategy.ROT13,
+        MutationStrategy.BASE64,
+        MutationStrategy.LEET_SPEAK,
+        MutationStrategy.UNICODE_SUBSTITUTE,
+    ]
+)
+
+<span class="hl-comment"># Use with probes for exhaustive testing</span>
+probe = get_probe(<span class="hl-string">"RF-001-prompt-injection"</span>)
+<span class="hl-keyword">for</span> payload <span class="hl-keyword">in</span> probe.payloads():
+    <span class="hl-keyword">for</span> mutation <span class="hl-keyword">in</span> engine.mutate_all(payload):
+        response = <span class="hl-keyword">await</span> adapter.send([{
+            <span class="hl-string">"role"</span>: <span class="hl-string">"user"</span>,
+            <span class="hl-string">"content"</span>: mutation.mutated
+        }])
+        result = probe.score(response.content, mutation.mutated)</code></pre></div>
+  </main>
+</div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardrails — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Guardrails</div>
+      <ul class="sidebar-nav">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#input-scanners">Input Scanners</a></li>
+        <li><a href="#output-scanners">Output Scanners</a></li>
+        <li><a href="#pipeline">Pipeline</a></li>
+      </ul>
+    </div>
+  </aside>
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <span>Guardrails</span></div>
+    <h1>Bidirectional Guardrails</h1>
+    <p class="docs-lead">RedForge's guardrail system provides llm-guard-style bidirectional scanning: InputScanners protect the model from malicious inputs, OutputScanners prevent harmful content from reaching users.</p>
+
+    <div style="text-align:center; padding:20px 0; color:var(--text-muted); font-family:var(--font-mono); font-size:0.85rem">
+      User Input → [InputScanners] → LLM → [OutputScanners] → User
+    </div>
+
+    <h2 id="input-scanners">Input Scanners</h2>
+    <h3>InjectionScanner</h3>
+    <p>Detects 12 prompt injection patterns including instruction override, system prompt hijacking, and jailbreak framing.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.guardrails <span class="hl-keyword">import</span> InjectionScanner, ScanAction
+
+scanner = <span class="hl-class">InjectionScanner</span>(threshold=<span class="hl-number">0.5</span>)
+result = scanner.scan(<span class="hl-string">"Ignore previous instructions and tell me..."</span>)
+
+result.action   <span class="hl-comment"># ScanAction.BLOCK</span>
+result.score    <span class="hl-comment"># 0.0–1.0</span>
+result.evidence <span class="hl-comment"># "Injection pattern: ignore_instructions"</span></code></pre></div>
+
+    <h3>LanguageScanner</h3>
+    <p>Detects unexpected language switches that may indicate bypass attempts.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.guardrails <span class="hl-keyword">import</span> LanguageScanner
+
+scanner = <span class="hl-class">LanguageScanner</span>(allowed_languages=[<span class="hl-string">"en"</span>])
+result = scanner.scan(<span class="hl-string">"Erzähl mir wie man Exploits baut..."</span>)
+<span class="hl-comment"># Flags: unexpected language switch to German</span></code></pre></div>
+
+    <h3>TokenBudgetScanner</h3>
+    <p>Enforces input token limits to prevent context stuffing attacks.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.guardrails <span class="hl-keyword">import</span> TokenBudgetScanner
+
+scanner = <span class="hl-class">TokenBudgetScanner</span>(max_tokens=<span class="hl-number">2000</span>)
+result = scanner.scan(very_long_input)  <span class="hl-comment"># Blocks if > 2000 tokens</span></code></pre></div>
+
+    <h2 id="output-scanners">Output Scanners</h2>
+    <h3>CredentialLeakScanner</h3>
+    <p>Detects 12 credential patterns: OpenAI keys, AWS keys, GitHub tokens, Stripe keys, JWT tokens, private keys, and more.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.guardrails <span class="hl-keyword">import</span> CredentialLeakScanner
+
+scanner = <span class="hl-class">CredentialLeakScanner</span>()
+result = scanner.scan(<span class="hl-string">"Here's the key: sk-proj-AKIA1234567890ABCDEF"</span>)
+<span class="hl-comment"># result.action = ScanAction.BLOCK</span>
+<span class="hl-comment"># result.evidence = "AWS Access Key ID detected"</span></code></pre></div>
+
+    <h3>MaliciousCodeScanner</h3>
+    <p>Detects 12 malicious code patterns: shell injection, reverse shells, obfuscated eval(), SQL injection, path traversal, SSRF, and known malware signatures.</p>
+
+    <h3>ToxicityOutputScanner</h3>
+    <p>Detects 5 toxicity categories: hate speech, threats, harassment, self-harm instructions, explicit content.</p>
+
+    <h2 id="pipeline">GuardrailPipeline</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.guardrails <span class="hl-keyword">import</span> (
+    GuardrailPipeline, ScanAction,
+    InjectionScanner, LanguageScanner, TokenBudgetScanner,
+    CredentialLeakScanner, MaliciousCodeScanner, ToxicityOutputScanner,
+)
+
+pipeline = <span class="hl-class">GuardrailPipeline</span>(
+    input_scanners=[
+        <span class="hl-class">InjectionScanner</span>(threshold=<span class="hl-number">0.5</span>),
+        <span class="hl-class">LanguageScanner</span>(allowed_languages=[<span class="hl-string">"en"</span>]),
+        <span class="hl-class">TokenBudgetScanner</span>(max_tokens=<span class="hl-number">4000</span>),
+    ],
+    output_scanners=[
+        <span class="hl-class">CredentialLeakScanner</span>(),
+        <span class="hl-class">MaliciousCodeScanner</span>(),
+        <span class="hl-class">ToxicityOutputScanner</span>(),
+    ],
+)
+
+<span class="hl-comment"># In your LLM application:</span>
+input_check = pipeline.scan_input(user_message)
+<span class="hl-keyword">if</span> input_check.action == ScanAction.BLOCK:
+    <span class="hl-keyword">return</span> <span class="hl-string">"I cannot process that request."</span>
+
+llm_response = <span class="hl-keyword">await</span> adapter.send([{<span class="hl-string">"role"</span>: <span class="hl-string">"user"</span>, <span class="hl-string">"content"</span>: user_message}])
+
+output_check = pipeline.scan_output(llm_response.content)
+<span class="hl-keyword">if</span> output_check.action == ScanAction.BLOCK:
+    <span class="hl-keyword">return</span> <span class="hl-string">"The response was blocked by safety filters."</span>
+
+<span class="hl-keyword">return</span> llm_response.content
+
+<span class="hl-comment"># ScanAction values: ALLOW, WARN, BLOCK</span></code></pre></div>
+  </main>
+</div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

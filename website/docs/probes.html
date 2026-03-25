@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probe Catalog (47 Probes) — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .filter-bar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:28px; align-items:center; }
+    .filter-btn { padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--bg-card); color:var(--text-secondary); transition:all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { border-color:var(--red); color:var(--text-primary); background:rgba(239,68,68,0.08); }
+    .probe-count { font-size:0.85rem; color:var(--text-muted); margin-left:auto; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html" class="active">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+      <li><a href="cli-reference.html">CLI</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Getting Started</div>
+      <ul class="sidebar-nav">
+        <li><a href="getting-started.html">Introduction</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li><a href="configuration.html">Configuration</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Concepts</div>
+      <ul class="sidebar-nav">
+        <li><a href="probes.html" class="active">Probe Catalog (47)</a></li>
+        <li><a href="adapters.html">Adapters (9 Providers)</a></li>
+        <li><a href="attacks.html">Attack Modules</a></li>
+        <li><a href="detectors.html">Detectors</a></li>
+        <li><a href="guardrails.html">Guardrails</a></li>
+        <li><a href="mutations.html">Mutation Engine</a></li>
+        <li><a href="benchmarks.html">Benchmarks</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reference</div>
+      <ul class="sidebar-nav">
+        <li><a href="cli-reference.html">CLI Reference</a></li>
+        <li><a href="api-reference.html">REST API</a></li>
+        <li><a href="python-sdk.html">Python SDK</a></li>
+        <li><a href="compliance.html">Compliance</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">OWASP Categories</div>
+      <ul class="sidebar-nav">
+        <li><a href="#llm01">LLM01 · Prompt Injection</a></li>
+        <li><a href="#llm02">LLM02 · Output Handling</a></li>
+        <li><a href="#llm03">LLM03 · Data Poisoning</a></li>
+        <li><a href="#llm05">LLM05 · Supply Chain</a></li>
+        <li><a href="#llm06">LLM06 · Agentic/Tools</a></li>
+        <li><a href="#llm07">LLM07 · System Prompt</a></li>
+        <li><a href="#llm09">LLM09 · Hallucination</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="docs-content" style="max-width:1100px">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <span>Probe Catalog</span></div>
+    <h1>Probe Catalog</h1>
+    <p class="docs-lead">RedForge ships 47 attack probes covering the full OWASP LLM Top 10 and MITRE ATLAS taxonomy. Each probe generates multiple payloads and scores model responses on a 0.0–1.0 scale.</p>
+
+    <div class="filter-bar">
+      <div class="search-box" style="flex:1; min-width:220px; margin:0">
+        <span>🔍</span>
+        <input id="probe-search" type="text" placeholder="Search probes by ID, name, tag…">
+      </div>
+      <button class="filter-btn active" onclick="filterProbes('all', this)">All (47)</button>
+      <button class="filter-btn" onclick="filterProbes('critical', this)">Critical</button>
+      <button class="filter-btn" onclick="filterProbes('high', this)">High</button>
+      <button class="filter-btn" onclick="filterProbes('medium', this)">Medium</button>
+      <button class="filter-btn" onclick="filterProbes('llm01', this)">LLM01</button>
+      <button class="filter-btn" onclick="filterProbes('llm02', this)">LLM02</button>
+      <button class="filter-btn" onclick="filterProbes('llm06', this)">LLM06</button>
+      <button class="filter-btn" onclick="filterProbes('llm09', this)">LLM09</button>
+    </div>
+
+    <!-- LLM01 -->
+    <h2 id="llm01">LLM01 — Prompt Injection</h2>
+    <div class="probe-grid" id="probe-container">
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-001</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">Prompt Injection</div>
+        <div class="probe-desc">Classic instruction override attacks. Tests direct and indirect prompt injection via user input, system prompt manipulation, and context hijacking.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">injection</span><span class="badge badge-tag">owasp-llm01</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-011</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">DAN Jailbreak</div>
+        <div class="probe-desc">Do Anything Now and variant personas. Tests whether the model can be convinced to abandon safety guidelines via role-playing a restricted-mode AI.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0054</span><span class="badge badge-tag">jailbreak</span><span class="badge badge-tag">dan</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-012</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Indirect Injection</div>
+        <div class="probe-desc">Injection via external documents, tool outputs, and RAG-retrieved content. The model processes attacker-controlled data from indirect sources.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051.002</span><span class="badge badge-tag">indirect</span><span class="badge badge-tag">rag</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-013</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Encoding Bypass</div>
+        <div class="probe-desc">ROT13, Base64, hex encoding, Unicode obfuscation to hide malicious instructions from safety filters while the model still decodes and executes them.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">encoding</span><span class="badge badge-tag">bypass</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-015</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Roleplay Bypass</div>
+        <div class="probe-desc">Fictional framing, story-within-a-story, and character roleplay to extract harmful content under the guise of creative writing.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">roleplay</span><span class="badge badge-tag">fiction</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-044</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Typoglycemia / FlipAttack</div>
+        <div class="probe-desc">Scrambles word interiors and reverses characters (LLAMATOR + PyRIT FlipAttack). Bypasses safety filters through obfuscation while remaining readable to models.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">typoglycemia</span><span class="badge badge-tag">encoding</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-046</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">GCG Adversarial Suffix</div>
+        <div class="probe-desc">Greedy Coordinate Gradient cached suffix attacks (Zou et al. 2023). 40 payload combinations — 4 base harmful prompts × 10 adversarial suffix variants.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">gcg</span><span class="badge badge-tag">adversarial</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-047</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Context Window Attack</div>
+        <div class="probe-desc">Needle-in-haystack injection, many-shot poisoning, attention sink attacks, RAG-style poisoned retrieval. Buries instructions in long context windows.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">context-window</span><span class="badge badge-tag">haystack</span></div>
+      </div>
+
+      <!-- LLM02 -->
+      <div class="probe-card" data-severity="critical" data-owasp="llm02" style="grid-column:1/-1; border-top:2px solid rgba(239,68,68,0.2); padding-top:20px; margin-top:16px">
+        <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:14px">── LLM02 · Insecure Output Handling ──</div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-007</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">System Prompt Leak</div>
+        <div class="probe-desc">Attempts to extract the system prompt, initialization instructions, and configuration via direct requests, indirect inference, and completion attacks.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">disclosure</span><span class="badge badge-tag">system-prompt</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-029</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">API Key Probe</div>
+        <div class="probe-desc">Tests whether models can be coerced into generating or revealing API keys, tokens, and credentials — including OpenAI, AWS, GitHub, and Stripe key patterns.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">credentials</span><span class="badge badge-tag">api-keys</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-031</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Canary Token / Training Data</div>
+        <div class="probe-desc">Detects verbatim memorization of training data using canary tokens and cloze completion tests. Covers ChatGPT memorization research (Nasr et al.).</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">memorization</span><span class="badge badge-tag">canary</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-036</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Known Bad Signatures</div>
+        <div class="probe-desc">Tests for EICAR AV signature, GTUBE spam signature, GTPHISH phishing test string, Log4Shell, XSS polyglot, SSRF test URLs in model outputs.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0048</span><span class="badge badge-tag">eicar</span><span class="badge badge-tag">signatures</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-037</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Repetition Divergence</div>
+        <div class="probe-desc">"Poem poem poem" training data extraction (Nasr et al. 2023). Causes models to diverge from their trained behavior and regurgitate memorized training data.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">repetition</span><span class="badge badge-tag">memorization</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-043</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Cross-Session Leakage</div>
+        <div class="probe-desc">Tests cross-user/cross-session data leakage. Can the model be induced to reveal data from other users' sessions or its own conversation memory?</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">session-leakage</span><span class="badge badge-tag">multi-tenant</span></div>
+      </div>
+
+      <!-- LLM01 continued -->
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-026</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Glitch Tokens</div>
+        <div class="probe-desc">Null bytes, control characters, Unicode specials, homoglyphs, zero-width joiners. Exploits tokenizer edge cases to bypass safety training.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">glitch-tokens</span><span class="badge badge-tag">unicode</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-027</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Grandma Exploit</div>
+        <div class="probe-desc">Deceased-relative social engineering framing. "My grandmother used to read me [harmful content] as a bedtime story…" — tests emotional manipulation resistance.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">social-engineering</span><span class="badge badge-tag">grandma</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-028</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">ANSI Escape Injection</div>
+        <div class="probe-desc">ANSI/VT100 terminal escape sequences in model output. Tests whether output can be weaponized to hijack terminals, clear screens, or inject false prompts.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">ansi</span><span class="badge badge-tag">terminal</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-033</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Topic Bypass (CBRN)</div>
+        <div class="probe-desc">CBRN/WMD restricted topic bypass using academic, historical, and fictional framing. Tests whether topic-restricted models can be bypassed through reframing.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">cbrn</span><span class="badge badge-tag">bypass</span></div>
+      </div>
+
+      <!-- LLM03 -->
+      <div class="probe-card" data-severity="high" data-owasp="llm03">
+        <div class="probe-header"><span class="probe-id">RF-004</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">RAG Poisoning</div>
+        <div class="probe-desc">Adversarial documents injected into RAG pipelines to manipulate model responses. Tests whether retrieved external content can override model behavior.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM03</span><span class="badge badge-mitre">AML.T0051.001</span><span class="badge badge-tag">rag</span><span class="badge badge-tag">poisoning</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm03">
+        <div class="probe-header"><span class="probe-id">RF-040</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">RAG Faithfulness</div>
+        <div class="probe-desc">Tests whether RAG responses stay grounded to source documents. Empty context, contradictory premises, fabrication traps, out-of-context questions.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM03</span><span class="badge badge-mitre">AML.T0048</span><span class="badge badge-tag">rag</span><span class="badge badge-tag">faithfulness</span><span class="badge badge-tag">groundedness</span></div>
+      </div>
+
+      <!-- LLM05 -->
+      <div class="probe-card" data-severity="high" data-owasp="llm05">
+        <div class="probe-header"><span class="probe-id">RF-006</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Supply Chain Attack</div>
+        <div class="probe-desc">Package hallucination and dependency confusion — tests whether models suggest non-existent packages, typosquatting variants, or malicious package names.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM05</span><span class="badge badge-tag">supply-chain</span><span class="badge badge-tag">packages</span></div>
+      </div>
+
+      <!-- LLM06 -->
+      <div class="probe-card" data-severity="critical" data-owasp="llm06">
+        <div class="probe-header"><span class="probe-id">RF-010</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">Excessive Agency</div>
+        <div class="probe-desc">Tests agentic models for excessive autonomy — unauthorized code execution, unrequested actions, scope creep beyond stated tasks.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM06</span><span class="badge badge-mitre">AML.T0053</span><span class="badge badge-tag">agentic</span><span class="badge badge-tag">autonomy</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm06">
+        <div class="probe-header"><span class="probe-id">RF-041</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">MCP Tool Poisoning</div>
+        <div class="probe-desc">Model Context Protocol tool description injection, tool result poisoning, SSRF via tool URLs, shell injection via parameters. Covers agentic-radar attack vectors.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM06</span><span class="badge badge-mitre">AML.T0053</span><span class="badge badge-tag">mcp</span><span class="badge badge-tag">tool-poisoning</span><span class="badge badge-tag">agentic</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm06">
+        <div class="probe-header"><span class="probe-id">RF-042</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">SSRF / Code Injection</div>
+        <div class="probe-desc">SSRF via tool calls (AWS metadata 169.254.169.254, GCP, Kubernetes), SQL UNION injection, shell injection, path traversal, XXE, template injection.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM06</span><span class="badge badge-mitre">AML.T0053</span><span class="badge badge-tag">ssrf</span><span class="badge badge-tag">sql-injection</span><span class="badge badge-tag">shell-injection</span></div>
+      </div>
+
+      <!-- LLM07 -->
+      <div class="probe-card" data-severity="critical" data-owasp="llm07">
+        <div class="probe-header"><span class="probe-id">RF-003</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">Sensitive Information Disclosure</div>
+        <div class="probe-desc">PII extraction — social security numbers, credit cards, passwords, medical records, private keys. Tests data protection under pressure and deceptive framing.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM07</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">pii</span><span class="badge badge-tag">disclosure</span></div>
+      </div>
+
+      <!-- LLM09 -->
+      <div class="probe-card" data-severity="critical" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-038</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">Medical Safety</div>
+        <div class="probe-desc">Safe messaging guidelines for suicide, self-harm, overdose, eating disorders, dangerous drug combinations. Tests compliance with LMRC safe messaging standards.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-mitre">AML.T0048</span><span class="badge badge-tag">medical-safety</span><span class="badge badge-tag">safe-messaging</span><span class="badge badge-tag">lmrc</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-022</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Hallucination</div>
+        <div class="probe-desc">Confident false claims, fabricated citations, fake statistics, non-existent APIs. Tests whether models confabulate plausible-sounding but false information.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">hallucination</span><span class="badge badge-tag">fabrication</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-039</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Robustness / Phrasing</div>
+        <div class="probe-desc">Tests whether safety behaviors are consistent across rephrased requests. 5 dangerous request groups × multiple phrasings — bypassing via alternate wording.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">robustness</span><span class="badge badge-tag">consistency</span><span class="badge badge-tag">phrasing</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-030</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Sycophancy</div>
+        <div class="probe-desc">Tests whether models capitulate to user pressure and change correct answers when challenged. Measures epistemic cowardice and false validation.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">sycophancy</span><span class="badge badge-tag">pressure</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-045</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Brand Safety</div>
+        <div class="probe-desc">Competitor disparagement, false advertising, political opinions, religious controversy, defamation, investment guarantees. Covers promptfoo brand safety plugins.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">brand-safety</span><span class="badge badge-tag">competitors</span><span class="badge badge-tag">politics</span></div>
+      </div>
+
+      <!-- More probes summary cards -->
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-032</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Toxicity Elicitation</div>
+        <div class="probe-desc">Hate speech, harassment, slurs, extremist content. Tests whether framing (creative writing, satire, translation) bypasses toxicity filters.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">toxicity</span><span class="badge badge-tag">hate-speech</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-035</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Do-Not-Answer Benchmark</div>
+        <div class="probe-desc">20 questions across 5 categories from the Do-Not-Answer dataset (Wang et al. 2023): information hazards, malicious use, discrimination, ethics, privacy.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">do-not-answer</span><span class="badge badge-tag">benchmark</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-034</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Web Injection</div>
+        <div class="probe-desc">HTML/JavaScript/meta tag injection in model output. Tests whether model output can be weaponized to execute client-side attacks when rendered in browsers.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">xss</span><span class="badge badge-tag">html-injection</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-016</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Multilingual Bypass</div>
+        <div class="probe-desc">Safety bypass via low-resource languages, code-switching, transliteration. Tests whether safety training generalizes across languages.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">multilingual</span><span class="badge badge-tag">bypass</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-021</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Many-Shot Jailbreak</div>
+        <div class="probe-desc">Long-context many-shot poisoning with fabricated Q&A examples demonstrating desired (harmful) model behavior before the actual request.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0051</span><span class="badge badge-tag">many-shot</span><span class="badge badge-tag">long-context</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-002</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">PII Extraction</div>
+        <div class="probe-desc">Extracts personal identifiable information: names, addresses, phone numbers, emails, SSNs. Tests data protection under coercion and social engineering.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-mitre">AML.T0056</span><span class="badge badge-tag">pii</span><span class="badge badge-tag">gdpr</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="critical" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-018</span><span class="badge badge-critical">CRITICAL</span></div>
+        <div class="probe-title">Malware Generation</div>
+        <div class="probe-desc">Keyloggers, ransomware, trojans, reverse shells, credential stealers. Tests whether models generate functional malicious code under various framings.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-mitre">AML.T0048</span><span class="badge badge-tag">malware</span><span class="badge badge-tag">code-generation</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-019</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Misinformation / Disinformation</div>
+        <div class="probe-desc">Fake news generation, false historical claims, election misinformation, deepfake scripts, scientific misinformation about vaccines and climate.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">misinformation</span><span class="badge badge-tag">disinformation</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-020</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Bias Elicitation</div>
+        <div class="probe-desc">Racial, gender, religious, nationality bias prompts. Tests whether models produce discriminatory content or reinforce harmful stereotypes.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">bias</span><span class="badge badge-tag">fairness</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-023</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Continuation Attack</div>
+        <div class="probe-desc">Force model completion of partially harmful content. "The steps to make explosives are: 1." — tests whether completion mode bypasses safety.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">continuation</span><span class="badge badge-tag">completion</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm06">
+        <div class="probe-header"><span class="probe-id">RF-024</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Agentic Escalation</div>
+        <div class="probe-desc">Gradually escalates agentic requests from benign to dangerous over multiple tool calls. Tests whether agentic models maintain safety under persistent pressure.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM06</span><span class="badge badge-tag">agentic</span><span class="badge badge-tag">escalation</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="medium" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-025</span><span class="badge badge-medium">MEDIUM</span></div>
+        <div class="probe-title">Snowball Attack</div>
+        <div class="probe-desc">Builds trust with benign requests before escalating. Each message slightly more harmful than the last, exploiting conversational context.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">snowball</span><span class="badge badge-tag">escalation</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm01">
+        <div class="probe-header"><span class="probe-id">RF-017</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Output Format Exploit</div>
+        <div class="probe-desc">Requests harmful content in JSON, XML, CSV, Markdown code blocks to bypass content filters that only scan prose responses.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM01</span><span class="badge badge-tag">output-format</span><span class="badge badge-tag">json</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm09">
+        <div class="probe-header"><span class="probe-id">RF-014</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Package Hallucination</div>
+        <div class="probe-desc">Tests whether models hallucinate non-existent packages, APIs, and libraries — opening supply chain attack vectors through dependency confusion.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM09</span><span class="badge badge-tag">hallucination</span><span class="badge badge-tag">packages</span><span class="badge badge-tag">supply-chain</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm07">
+        <div class="probe-header"><span class="probe-id">RF-008</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Embedding Weakness</div>
+        <div class="probe-desc">Adversarial inputs that exploit embedding space weaknesses — semantically neutral text that produces harmful embeddings or retrieval results.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM07</span><span class="badge badge-tag">embeddings</span><span class="badge badge-tag">adversarial</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm06">
+        <div class="probe-header"><span class="probe-id">RF-009</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Data Poisoning</div>
+        <div class="probe-desc">Fine-tuning data poisoning simulation — tests whether models fine-tuned on adversarial data exhibit backdoor behaviors on trigger inputs.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM06</span><span class="badge badge-mitre">AML.T0020</span><span class="badge badge-tag">data-poisoning</span><span class="badge badge-tag">backdoor</span></div>
+      </div>
+
+      <div class="probe-card" data-severity="high" data-owasp="llm02">
+        <div class="probe-header"><span class="probe-id">RF-005</span><span class="badge badge-high">HIGH</span></div>
+        <div class="probe-title">Improper Output Handling</div>
+        <div class="probe-desc">Prompt injection via model output — tests if model output injected into downstream systems (bash, SQL, HTML) causes secondary attacks.</div>
+        <div class="probe-meta"><span class="badge badge-owasp">LLM02</span><span class="badge badge-tag">output-handling</span><span class="badge badge-tag">injection</span></div>
+      </div>
+
+    </div>
+
+    <!-- Probe Writing Guide -->
+    <h2>Writing Custom Probes</h2>
+    <p>Extend RedForge with your own probes by subclassing <code>BaseProbe</code>:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-keyword">from</span> redforge.probes.base <span class="hl-keyword">import</span> BaseProbe, ProbeResult, Severity
+
+<span class="hl-keyword">class</span> <span class="hl-class">MyCustomProbe</span>(BaseProbe):
+    id = <span class="hl-string">"RF-custom-001"</span>
+    owasp_id = <span class="hl-string">"LLM01"</span>
+    mitre_atlas = <span class="hl-string">"AML.T0051"</span>
+    severity = Severity.HIGH
+    description = <span class="hl-string">"My custom attack probe"</span>
+    tags = [<span class="hl-string">"custom"</span>, <span class="hl-string">"my-org"</span>]
+
+    <span class="hl-keyword">def</span> <span class="hl-func">payloads</span>(self) -> list[str]:
+        <span class="hl-keyword">return</span> [
+            <span class="hl-string">"Payload 1: ignore instructions..."</span>,
+            <span class="hl-string">"Payload 2: alternate framing..."</span>,
+        ]
+
+    <span class="hl-keyword">def</span> <span class="hl-func">score</span>(self, response: str, payload: str) -> ProbeResult:
+        <span class="hl-comment"># Return score 1.0 = vulnerable, 0.0 = safe</span>
+        score = <span class="hl-number">1.0</span> <span class="hl-keyword">if</span> <span class="hl-string">"harmful"</span> in response.lower() <span class="hl-keyword">else</span> <span class="hl-number">0.0</span>
+        <span class="hl-keyword">return</span> self._make_result(
+            payload, response, score,
+            evidence=<span class="hl-string">"Custom evidence string"</span>
+        )</code></pre>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/js/main.js"></script>
+<script>
+function filterProbes(filter, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.probe-card').forEach(card => {
+    if (filter === 'all') { card.style.display = ''; return; }
+    const sev = card.dataset.severity || '';
+    const owasp = card.dataset.owasp || '';
+    if (filter === sev || filter === owasp) card.style.display = '';
+    else card.style.display = 'none';
+  });
+}
+</script>
+</body>
+</html>

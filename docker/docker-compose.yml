@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  redforge:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Required: set your API key for the RedForge REST API
+      - REDFORGE_API_KEY=${REDFORGE_API_KEY:?REDFORGE_API_KEY must be set}
+      # Optional: provider credentials (set only what you need)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT:-}
+      # CORS: comma-separated allowed origins (empty = none)
+      - REDFORGE_CORS_ORIGINS=${REDFORGE_CORS_ORIGINS:-}
+    volumes:
+      - ./scan_results:/app/scan_results
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  # Optional: Ollama for local model testing (no API key needed)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    profiles:
+      - local
+
+volumes:
+  ollama_data:

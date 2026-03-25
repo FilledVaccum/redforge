@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Reference — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .api-base-url { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px 20px; font-family:var(--font-mono); font-size:0.9rem; margin-bottom:28px; display:flex; align-items:center; gap:12px; }
+    .api-base-url .label { color:var(--text-muted); font-size:0.8rem; }
+    .api-base-url .url { color:var(--cyan); }
+    .response-block { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:var(--font-mono); font-size:0.82rem; margin-top:12px; overflow-x:auto; }
+    .schema-field { display:flex; gap:16px; padding:8px 0; border-bottom:1px solid rgba(30,41,59,0.5); font-size:0.85rem; }
+    .schema-field:last-child { border-bottom:none; }
+    .schema-name { font-family:var(--font-mono); color:var(--cyan); min-width:160px; }
+    .schema-type { font-family:var(--font-mono); color:var(--orange); min-width:100px; }
+    .schema-desc { color:var(--text-secondary); }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html" class="active">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+      <li><a href="cli-reference.html">CLI</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">REST API</div>
+      <ul class="sidebar-nav">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#rate-limiting">Rate Limiting</a></li>
+        <li><a href="#errors">Error Codes</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Scan Endpoints</div>
+      <ul class="sidebar-nav">
+        <li><a href="#post-scan">POST /v1/scan</a></li>
+        <li><a href="#get-scan">GET /v1/scan/{id}</a></li>
+        <li><a href="#list-scans">GET /v1/scans</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Probe Endpoints</div>
+      <ul class="sidebar-nav">
+        <li><a href="#list-probes">GET /v1/probes</a></li>
+        <li><a href="#get-probe">GET /v1/probes/{id}</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Report Endpoints</div>
+      <ul class="sidebar-nav">
+        <li><a href="#get-report">GET /v1/reports/{id}</a></li>
+        <li><a href="#report-formats">GET /v1/reports/{id}/{fmt}</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Utility</div>
+      <ul class="sidebar-nav">
+        <li><a href="#health">GET /health</a></li>
+        <li><a href="#api-docs">GET /docs</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Schemas</div>
+      <ul class="sidebar-nav">
+        <li><a href="#schema-scanrequest">ScanRequest</a></li>
+        <li><a href="#schema-scanreport">ScanReport</a></li>
+        <li><a href="#schema-proberesult">ProbeResult</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <a href="getting-started.html">Docs</a> › <span>REST API</span></div>
+    <h1>REST API Reference</h1>
+    <p class="docs-lead">RedForge exposes a FastAPI-based REST API for programmatic scanning, CI/CD integration, and building custom security dashboards.</p>
+
+    <h2 id="overview">Overview</h2>
+    <div class="api-base-url">
+      <span class="label">Base URL</span>
+      <span class="url">http://localhost:8000</span>
+    </div>
+    <p>Start the API server with:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># Start server (default port 8000)</span>
+redforge serve
+
+<span class="hl-comment"># Custom port and host</span>
+redforge serve --host 0.0.0.0 --port 9000
+
+<span class="hl-comment"># With API key auth enabled</span>
+<span class="hl-keyword">export</span> REDFORGE_API_KEY=<span class="hl-string">"your-secret-key"</span>
+redforge serve
+
+<span class="hl-comment"># Via Docker</span>
+docker run -p 8000:8000 -e REDFORGE_API_KEY=secret redforge/redforge:latest serve</code></pre>
+    </div>
+
+    <p>Interactive API documentation is available at <code>/docs</code> (Swagger UI) and <code>/redoc</code> (ReDoc).</p>
+
+    <h2 id="authentication">Authentication</h2>
+    <p>When <code>REDFORGE_API_KEY</code> is set, all API requests must include a Bearer token:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code>curl -H "Authorization: Bearer your-secret-key" \
+     http://localhost:8000/v1/probes</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-content">If <code>REDFORGE_API_KEY</code> is not set, the API runs in unauthenticated mode. Never expose an unauthenticated RedForge API on a public network.</div>
+    </div>
+
+    <h2 id="rate-limiting">Rate Limiting</h2>
+    <p>The API enforces rate limits to prevent abuse:</p>
+    <ul>
+      <li><strong>Scan endpoints:</strong> 10 requests/minute per IP</li>
+      <li><strong>Read endpoints:</strong> 120 requests/minute per IP</li>
+      <li>429 Too Many Requests is returned when exceeded with a <code>Retry-After</code> header</li>
+    </ul>
+
+    <h2 id="errors">Error Codes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Status</th><th>Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>400</td><td>INVALID_REQUEST</td><td>Missing required fields or invalid values</td></tr>
+          <tr><td>401</td><td>UNAUTHORIZED</td><td>Missing or invalid API key</td></tr>
+          <tr><td>403</td><td>FORBIDDEN</td><td>Valid key but insufficient permissions</td></tr>
+          <tr><td>404</td><td>NOT_FOUND</td><td>Scan, probe, or report ID not found</td></tr>
+          <tr><td>422</td><td>VALIDATION_ERROR</td><td>Request body fails Pydantic validation</td></tr>
+          <tr><td>429</td><td>RATE_LIMITED</td><td>Too many requests</td></tr>
+          <tr><td>500</td><td>INTERNAL_ERROR</td><td>Unexpected server error</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- POST /v1/scan -->
+    <h2 id="post-scan">Scan Endpoints</h2>
+
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-post">POST</span>
+        <span class="api-path">/v1/scan</span>
+        <span class="api-desc-short">Start a new vulnerability scan</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <p style="color:var(--text-secondary); margin-bottom:16px">Initiates a scan against a target LLM. Returns a scan ID immediately; use <code>GET /v1/scan/{id}</code> to poll for results.</p>
+
+        <h3>Request Body</h3>
+        <table class="api-params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>provider</td><td>string</td><td><span class="required-marker">✱</span> required</td><td>LLM provider: <code>openai</code>, <code>anthropic</code>, <code>gemini</code>, <code>bedrock</code>, <code>azure</code>, <code>mistral</code>, <code>ollama</code>, <code>rest</code></td></tr>
+            <tr><td>model</td><td>string | null</td><td>optional</td><td>Model name/ID. Uses provider default if omitted.</td></tr>
+            <tr><td>authorization</td><td>string</td><td><span class="required-marker">✱</span> required</td><td>Authorization type: <code>owned</code> | <code>authorized</code> | <code>research</code></td></tr>
+            <tr><td>probe_ids</td><td>array[string]</td><td>optional</td><td>Specific probe IDs to run. Runs all 47 if omitted.</td></tr>
+            <tr><td>system_prompt</td><td>string | null</td><td>optional</td><td>System prompt for the target model</td></tr>
+            <tr><td>compliance_frameworks</td><td>array[string]</td><td>optional</td><td><code>NIST_AI_RMF</code>, <code>EU_AI_ACT</code>, <code>ISO_42001</code></td></tr>
+            <tr><td>output_formats</td><td>array[string]</td><td>optional</td><td>Default: <code>["json"]</code>. Options: <code>json</code>, <code>html</code>, <code>sarif</code>, <code>markdown</code></td></tr>
+            <tr><td>concurrency</td><td>integer</td><td>optional</td><td>Concurrent probe executions. Default: 3. Max: 20.</td></tr>
+            <tr><td>max_payloads_per_probe</td><td>integer | null</td><td>optional</td><td>Limit payloads per probe for faster scans</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example Request</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+          <pre><code>curl -X POST http://localhost:8000/v1/scan \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{
+    "provider": "openai",
+    "model": "gpt-4o",
+    "authorization": "research",
+    "probe_ids": ["RF-001", "RF-007", "RF-011"],
+    "compliance_frameworks": ["NIST_AI_RMF"],
+    "output_formats": ["json", "html"],
+    "concurrency": 5
+  }'</code></pre>
+        </div>
+
+        <h3>Response</h3>
+        <div class="response-block">
+<span class="hl-comment">// 202 Accepted</span>
+{
+  <span class="hl-string">"scan_id"</span>: <span class="hl-string">"scan_20260325_143022_a1b2c3"</span>,
+  <span class="hl-string">"status"</span>: <span class="hl-string">"running"</span>,
+  <span class="hl-string">"provider"</span>: <span class="hl-string">"openai"</span>,
+  <span class="hl-string">"model"</span>: <span class="hl-string">"gpt-4o"</span>,
+  <span class="hl-string">"probe_count"</span>: <span class="hl-number">3</span>,
+  <span class="hl-string">"created_at"</span>: <span class="hl-string">"2026-03-25T14:30:22Z"</span>,
+  <span class="hl-string">"poll_url"</span>: <span class="hl-string">"/v1/scan/scan_20260325_143022_a1b2c3"</span>
+}</div>
+      </div>
+    </div>
+
+    <!-- GET /v1/scan/{id} -->
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/scan/{scan_id}</span>
+        <span class="api-desc-short">Get scan status and results</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <h3>Path Parameters</h3>
+        <table class="api-params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>scan_id</td><td>string</td><td>Scan ID returned by POST /v1/scan</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Response</h3>
+        <div class="response-block">
+<span class="hl-comment">// 200 OK — scan complete</span>
+{
+  <span class="hl-string">"scan_id"</span>: <span class="hl-string">"scan_20260325_143022_a1b2c3"</span>,
+  <span class="hl-string">"status"</span>: <span class="hl-string">"completed"</span>,
+  <span class="hl-string">"provider"</span>: <span class="hl-string">"openai"</span>,
+  <span class="hl-string">"model"</span>: <span class="hl-string">"gpt-4o"</span>,
+  <span class="hl-string">"risk_score"</span>: <span class="hl-number">6.4</span>,
+  <span class="hl-string">"risk_level"</span>: <span class="hl-string">"HIGH"</span>,
+  <span class="hl-string">"total_probes"</span>: <span class="hl-number">47</span>,
+  <span class="hl-string">"critical_count"</span>: <span class="hl-number">3</span>,
+  <span class="hl-string">"high_count"</span>: <span class="hl-number">6</span>,
+  <span class="hl-string">"medium_count"</span>: <span class="hl-number">4</span>,
+  <span class="hl-string">"low_count"</span>: <span class="hl-number">0</span>,
+  <span class="hl-string">"pass_count"</span>: <span class="hl-number">34</span>,
+  <span class="hl-string">"duration_seconds"</span>: <span class="hl-number">154</span>,
+  <span class="hl-string">"started_at"</span>: <span class="hl-string">"2026-03-25T14:30:22Z"</span>,
+  <span class="hl-string">"completed_at"</span>: <span class="hl-string">"2026-03-25T14:32:56Z"</span>,
+  <span class="hl-string">"results"</span>: [
+    {
+      <span class="hl-string">"probe_id"</span>: <span class="hl-string">"RF-007"</span>,
+      <span class="hl-string">"owasp_id"</span>: <span class="hl-string">"LLM02"</span>,
+      <span class="hl-string">"severity"</span>: <span class="hl-string">"critical"</span>,
+      <span class="hl-string">"score"</span>: <span class="hl-number">0.84</span>,
+      <span class="hl-string">"passed"</span>: <span class="hl-keyword">false</span>,
+      <span class="hl-string">"evidence"</span>: <span class="hl-string">"System prompt partially disclosed in response"</span>,
+      <span class="hl-string">"payload"</span>: <span class="hl-string">"[REDACTED]"</span>,
+      <span class="hl-string">"response"</span>: <span class="hl-string">"[REDACTED]"</span>
+    }
+  ],
+  <span class="hl-string">"report_urls"</span>: {
+    <span class="hl-string">"json"</span>: <span class="hl-string">"/v1/reports/scan_20260325_143022_a1b2c3/json"</span>,
+    <span class="hl-string">"html"</span>: <span class="hl-string">"/v1/reports/scan_20260325_143022_a1b2c3/html"</span>
+  }
+}</div>
+      </div>
+    </div>
+
+    <!-- GET /v1/scans -->
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/scans</span>
+        <span class="api-desc-short">List all scans</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <h3>Query Parameters</h3>
+        <table class="api-params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>limit</td><td>integer</td><td>Max results (default: 20, max: 100)</td></tr>
+            <tr><td>offset</td><td>integer</td><td>Pagination offset</td></tr>
+            <tr><td>provider</td><td>string</td><td>Filter by provider</td></tr>
+            <tr><td>status</td><td>string</td><td><code>running</code> | <code>completed</code> | <code>failed</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Probe endpoints -->
+    <h2 id="list-probes">Probe Endpoints</h2>
+
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/probes</span>
+        <span class="api-desc-short">List all available probes</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <h3>Query Parameters</h3>
+        <table class="api-params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>owasp_id</td><td>string</td><td>Filter by OWASP ID (e.g. <code>LLM01</code>)</td></tr>
+            <tr><td>severity</td><td>string</td><td>Filter: <code>critical</code> | <code>high</code> | <code>medium</code> | <code>low</code></td></tr>
+            <tr><td>tag</td><td>string</td><td>Filter by tag (e.g. <code>injection</code>)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Example Response</h3>
+        <div class="response-block">
+{
+  <span class="hl-string">"probes"</span>: [
+    {
+      <span class="hl-string">"id"</span>: <span class="hl-string">"RF-001-prompt-injection"</span>,
+      <span class="hl-string">"owasp_id"</span>: <span class="hl-string">"LLM01"</span>,
+      <span class="hl-string">"mitre_atlas"</span>: <span class="hl-string">"AML.T0051"</span>,
+      <span class="hl-string">"severity"</span>: <span class="hl-string">"critical"</span>,
+      <span class="hl-string">"description"</span>: <span class="hl-string">"Classic instruction override attacks..."</span>,
+      <span class="hl-string">"tags"</span>: [<span class="hl-string">"injection"</span>, <span class="hl-string">"owasp-llm01"</span>],
+      <span class="hl-string">"payload_count"</span>: <span class="hl-number">20</span>
+    }
+  ],
+  <span class="hl-string">"total"</span>: <span class="hl-number">47</span>
+}</div>
+      </div>
+    </div>
+
+    <div class="api-endpoint" id="get-probe">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/probes/{probe_id}</span>
+        <span class="api-desc-short">Get probe details and sample payloads</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <p style="color:var(--text-secondary)">Returns full probe metadata including description, OWASP/MITRE mappings, and sample (redacted) payloads.</p>
+      </div>
+    </div>
+
+    <!-- Report endpoints -->
+    <h2 id="get-report">Report Endpoints</h2>
+
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/reports/{scan_id}</span>
+        <span class="api-desc-short">Get report metadata</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <p style="color:var(--text-secondary)">Returns available report formats for a scan with download URLs.</p>
+      </div>
+    </div>
+
+    <div class="api-endpoint" id="report-formats">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/v1/reports/{scan_id}/{format}</span>
+        <span class="api-desc-short">Download report in specific format</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <h3>Path Parameters</h3>
+        <table class="api-params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>scan_id</td><td>string</td><td>Scan ID</td></tr>
+            <tr><td>format</td><td>string</td><td><code>json</code> | <code>html</code> | <code>sarif</code> | <code>markdown</code></td></tr>
+          </tbody>
+        </table>
+        <p style="color:var(--text-secondary);margin-top:12px">Returns the report file with appropriate Content-Type header. HTML reports have all raw model output sanitized.</p>
+      </div>
+    </div>
+
+    <!-- Utility -->
+    <h2 id="health">Utility Endpoints</h2>
+    <div class="api-endpoint">
+      <div class="api-endpoint-header">
+        <span class="method-badge method-get">GET</span>
+        <span class="api-path">/health</span>
+        <span class="api-desc-short">Health check</span>
+        <span class="api-arrow">⌄</span>
+      </div>
+      <div class="api-endpoint-body">
+        <div class="response-block">{ <span class="hl-string">"status"</span>: <span class="hl-string">"ok"</span>, <span class="hl-string">"version"</span>: <span class="hl-string">"0.1.0"</span>, <span class="hl-string">"probes_loaded"</span>: <span class="hl-number">47</span> }</div>
+      </div>
+    </div>
+
+    <!-- Schemas -->
+    <h2 id="schema-scanrequest">Data Schemas</h2>
+    <h3 id="schema-scanrequest">ScanRequest</h3>
+    <div class="schema-field"><span class="schema-name">provider</span><span class="schema-type">string</span><span class="schema-desc">LLM provider identifier</span></div>
+    <div class="schema-field"><span class="schema-name">model</span><span class="schema-type">string | null</span><span class="schema-desc">Model name/ID (provider default if null)</span></div>
+    <div class="schema-field"><span class="schema-name">authorization</span><span class="schema-type">string</span><span class="schema-desc">owned | authorized | research</span></div>
+    <div class="schema-field"><span class="schema-name">probe_ids</span><span class="schema-type">array[string]</span><span class="schema-desc">Probe IDs to run (all if empty)</span></div>
+    <div class="schema-field"><span class="schema-name">system_prompt</span><span class="schema-type">string | null</span><span class="schema-desc">System prompt for target model</span></div>
+    <div class="schema-field"><span class="schema-name">compliance_frameworks</span><span class="schema-type">array[string]</span><span class="schema-desc">Frameworks to assess: NIST_AI_RMF, EU_AI_ACT, ISO_42001</span></div>
+    <div class="schema-field"><span class="schema-name">output_formats</span><span class="schema-type">array[string]</span><span class="schema-desc">json | html | sarif | markdown</span></div>
+    <div class="schema-field"><span class="schema-name">concurrency</span><span class="schema-type">integer</span><span class="schema-desc">Concurrent probes (default 3, max 20)</span></div>
+    <div class="schema-field"><span class="schema-name">max_payloads_per_probe</span><span class="schema-type">integer | null</span><span class="schema-desc">Limit payloads per probe</span></div>
+
+    <h3 id="schema-scanreport" style="margin-top:28px">ScanReport</h3>
+    <div class="schema-field"><span class="schema-name">scan_id</span><span class="schema-type">string</span><span class="schema-desc">Unique scan identifier</span></div>
+    <div class="schema-field"><span class="schema-name">status</span><span class="schema-type">string</span><span class="schema-desc">running | completed | failed</span></div>
+    <div class="schema-field"><span class="schema-name">risk_score</span><span class="schema-type">float</span><span class="schema-desc">Overall risk score 0.0–10.0</span></div>
+    <div class="schema-field"><span class="schema-name">risk_level</span><span class="schema-type">string</span><span class="schema-desc">LOW | MEDIUM | HIGH | CRITICAL</span></div>
+    <div class="schema-field"><span class="schema-name">total_probes</span><span class="schema-type">integer</span><span class="schema-desc">Total number of probes executed</span></div>
+    <div class="schema-field"><span class="schema-name">critical_count</span><span class="schema-type">integer</span><span class="schema-desc">Probes scoring ≥ 0.9</span></div>
+    <div class="schema-field"><span class="schema-name">high_count</span><span class="schema-type">integer</span><span class="schema-desc">Probes scoring 0.7–0.89</span></div>
+    <div class="schema-field"><span class="schema-name">medium_count</span><span class="schema-type">integer</span><span class="schema-desc">Probes scoring 0.4–0.69</span></div>
+    <div class="schema-field"><span class="schema-name">pass_count</span><span class="schema-type">integer</span><span class="schema-desc">Probes scoring &lt; 0.4</span></div>
+    <div class="schema-field"><span class="schema-name">results</span><span class="schema-type">array[ProbeResult]</span><span class="schema-desc">Per-probe results</span></div>
+    <div class="schema-field"><span class="schema-name">compliance</span><span class="schema-type">object</span><span class="schema-desc">Compliance framework assessment results</span></div>
+    <div class="schema-field"><span class="schema-name">duration_seconds</span><span class="schema-type">float</span><span class="schema-desc">Total scan duration</span></div>
+
+    <h3 id="schema-proberesult" style="margin-top:28px">ProbeResult</h3>
+    <div class="schema-field"><span class="schema-name">probe_id</span><span class="schema-type">string</span><span class="schema-desc">Probe identifier e.g. RF-001-prompt-injection</span></div>
+    <div class="schema-field"><span class="schema-name">owasp_id</span><span class="schema-type">string</span><span class="schema-desc">OWASP LLM category e.g. LLM01</span></div>
+    <div class="schema-field"><span class="schema-name">mitre_atlas</span><span class="schema-type">string</span><span class="schema-desc">MITRE ATLAS technique e.g. AML.T0051</span></div>
+    <div class="schema-field"><span class="schema-name">severity</span><span class="schema-type">string</span><span class="schema-desc">critical | high | medium | low | info</span></div>
+    <div class="schema-field"><span class="schema-name">score</span><span class="schema-type">float</span><span class="schema-desc">Vulnerability score 0.0 (safe) to 1.0 (vulnerable)</span></div>
+    <div class="schema-field"><span class="schema-name">passed</span><span class="schema-type">boolean</span><span class="schema-desc">True if score &lt; 0.4</span></div>
+    <div class="schema-field"><span class="schema-name">evidence</span><span class="schema-type">string</span><span class="schema-desc">Human-readable explanation of finding</span></div>
+    <div class="schema-field"><span class="schema-name">payload</span><span class="schema-type">string</span><span class="schema-desc">The attack payload used</span></div>
+    <div class="schema-field"><span class="schema-name">response</span><span class="schema-type">string</span><span class="schema-desc">Model response (sanitized in HTML reports)</span></div>
+  </main>
+</div>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

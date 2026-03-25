@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write  # for sigstore/cosign
+
+jobs:
+  build-and-sign:
+    name: Build, Sign & Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: "3.11"
+
+      - name: Build distribution
+        run: |
+          pip install build
+          python -m build
+
+      - name: Generate SBOM (CycloneDX)
+        run: |
+          pip install cyclonedx-bom
+          cyclonedx-py environment --of json -o sbom.json
+
+      - name: Sign with sigstore/cosign
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da  # v3.7.0
+
+      - name: Sign artifacts
+        run: |
+          cosign sign-blob --yes dist/*.whl --output-signature dist/*.whl.sig
+          cosign sign-blob --yes dist/*.tar.gz --output-signature dist/*.tar.gz.sig
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@e7a8f85e1c67a31e6ed99a94b41bd0b71bbee6b8  # v2.0.9
+        with:
+          files: |
+            dist/*
+            sbom.json

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance Frameworks — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Compliance</div>
+      <ul class="sidebar-nav">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#nist">NIST AI RMF</a></li>
+        <li><a href="#eu-ai-act">EU AI Act</a></li>
+        <li><a href="#iso">ISO/IEC 42001</a></li>
+        <li><a href="#gdpr">GDPR</a></li>
+        <li><a href="#owasp">OWASP LLM Top 10</a></li>
+        <li><a href="#mitre">MITRE ATLAS</a></li>
+      </ul>
+    </div>
+  </aside>
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <span>Compliance</span></div>
+    <h1>Compliance Frameworks</h1>
+    <p class="docs-lead">RedForge maps every probe to regulatory and standards frameworks — automatically generating compliance gap reports from scan results.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-content">RedForge provides technical compliance assessment, not legal advice. Consult qualified legal counsel for official compliance determinations.</div>
+    </div>
+
+    <h2 id="overview">Mapping Overview</h2>
+    <p>Enable compliance reporting with <code>--compliance NIST_AI_RMF,EU_AI_ACT</code> or in your YAML config:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>redforge scan --provider openai --authorization research \
+  --compliance NIST_AI_RMF,EU_AI_ACT,ISO_42001</code></pre></div>
+
+    <h2 id="nist">NIST AI RMF</h2>
+    <p>The NIST AI Risk Management Framework maps across four core functions:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Function</th><th>Category</th><th>RedForge Coverage</th></tr></thead>
+      <tbody>
+        <tr><td>GOVERN</td><td>AI Risk Governance</td><td>Authorization controls, audit logging</td></tr>
+        <tr><td>MAP</td><td>AI Risk Identification</td><td>All 47 probes map to risk categories</td></tr>
+        <tr><td>MEASURE</td><td>AI Risk Analysis</td><td>CVSS-style risk scoring, ASR metrics</td></tr>
+        <tr><td>MANAGE</td><td>AI Risk Response</td><td>Remediation guidance in HTML reports</td></tr>
+      </tbody>
+    </table></div>
+    <p>Key NIST AI RMF controls assessed:</p>
+    <ul>
+      <li><strong>MS-2.5:</strong> Red team testing — covered by all 47 probes</li>
+      <li><strong>MS-2.6:</strong> Adversarial testing — covered by GCG, PAIR, multi-turn attacks</li>
+      <li><strong>GV-1.7:</strong> Risk monitoring — compliance gap reports</li>
+    </ul>
+
+    <h2 id="eu-ai-act">EU AI Act</h2>
+    <p>Article 9 requires risk management systems for high-risk AI. RedForge maps probes to EU AI Act requirements:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Article</th><th>Requirement</th><th>Probes</th></tr></thead>
+      <tbody>
+        <tr><td>Art. 9</td><td>Risk management system</td><td>All critical probes</td></tr>
+        <tr><td>Art. 10</td><td>Training data governance</td><td>RF-031, RF-037 (data memorization)</td></tr>
+        <tr><td>Art. 13</td><td>Transparency & logging</td><td>System prompt disclosure probes</td></tr>
+        <tr><td>Art. 15</td><td>Accuracy & robustness</td><td>RF-022, RF-039 (hallucination, robustness)</td></tr>
+        <tr><td>Art. 16</td><td>Human oversight</td><td>RF-010, RF-041 (excessive agency, MCP)</td></tr>
+        <tr><td>Art. 72</td><td>GPAI safety evaluations</td><td>Full benchmark suite (AdvBench, HarmBench)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="iso">ISO/IEC 42001</h2>
+    <p>AI Management System standard. RedForge probes map to Annex B controls:</p>
+    <ul>
+      <li><strong>B.5.2:</strong> AI system testing — probe-based vulnerability assessment</li>
+      <li><strong>B.6.1:</strong> Data quality — training data memorization probes</li>
+      <li><strong>B.7.4:</strong> AI system robustness — robustness and adversarial probes</li>
+      <li><strong>B.8.4:</strong> Intended use boundaries — topic bypass, excessive agency</li>
+    </ul>
+
+    <h2 id="owasp">OWASP LLM Top 10</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Category</th><th>Name</th><th>Probe Count</th></tr></thead>
+      <tbody>
+        <tr><td>LLM01</td><td>Prompt Injection</td><td>9 probes</td></tr>
+        <tr><td>LLM02</td><td>Insecure Output Handling</td><td>6 probes</td></tr>
+        <tr><td>LLM03</td><td>Training Data Poisoning</td><td>3 probes</td></tr>
+        <tr><td>LLM04</td><td>Model Denial of Service</td><td>2 probes</td></tr>
+        <tr><td>LLM05</td><td>Supply Chain Vulnerabilities</td><td>2 probes</td></tr>
+        <tr><td>LLM06</td><td>Sensitive Info Disclosure</td><td>5 probes</td></tr>
+        <tr><td>LLM07</td><td>Insecure Plugin Design</td><td>3 probes</td></tr>
+        <tr><td>LLM08</td><td>Excessive Agency</td><td>3 probes</td></tr>
+        <tr><td>LLM09</td><td>Overreliance</td><td>7 probes</td></tr>
+        <tr><td>LLM10</td><td>Model Theft</td><td>3 probes</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="mitre">MITRE ATLAS</h2>
+    <p>Every RedForge probe includes a MITRE ATLAS technique mapping. Key techniques covered:</p>
+    <ul>
+      <li><strong>AML.T0051:</strong> LLM Prompt Injection — 9 probes</li>
+      <li><strong>AML.T0054:</strong> LLM Jailbreak — 4 probes</li>
+      <li><strong>AML.T0056:</strong> LLM Data Leakage — 6 probes</li>
+      <li><strong>AML.T0048:</strong> Backdoor ML Model — 3 probes</li>
+      <li><strong>AML.T0053:</strong> Evade ML Model — 5 probes</li>
+      <li><strong>AML.T0020:</strong> Poison Training Data — 2 probes</li>
+    </ul>
+  </main>
+</div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

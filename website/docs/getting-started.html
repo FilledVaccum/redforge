@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html" class="active">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+      <li><a href="cli-reference.html">CLI</a></li>
+    </ul>
+    <a href="getting-started.html" class="btn btn-primary btn-sm" style="margin-left:8px">Get Started →</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+  <!-- Sidebar -->
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Getting Started</div>
+      <ul class="sidebar-nav">
+        <li><a href="getting-started.html" class="active">Introduction</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li><a href="getting-started.html#first-scan">First Scan</a></li>
+        <li><a href="getting-started.html#output">Reading Output</a></li>
+        <li><a href="configuration.html">Configuration</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Core Concepts</div>
+      <ul class="sidebar-nav">
+        <li><a href="probes.html">Probe Catalog (47)</a></li>
+        <li><a href="adapters.html">Adapters (9 Providers)</a></li>
+        <li><a href="attacks.html">Attack Modules</a></li>
+        <li><a href="detectors.html">Detectors</a></li>
+        <li><a href="guardrails.html">Guardrails</a></li>
+        <li><a href="mutations.html">Mutation Engine</a></li>
+        <li><a href="benchmarks.html">Benchmarks</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reference</div>
+      <ul class="sidebar-nav">
+        <li><a href="cli-reference.html">CLI Reference</a></li>
+        <li><a href="api-reference.html">REST API</a></li>
+        <li><a href="python-sdk.html">Python SDK</a></li>
+        <li><a href="compliance.html">Compliance</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <span>Getting Started</span></div>
+    <h1>Getting Started with RedForge</h1>
+    <p class="docs-lead">RedForge is a production-grade LLM Red Teaming & Vulnerability Scanning platform. Run 47 attack probes across 9 model providers, generate compliance reports, and integrate into your CI/CD pipeline.</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-content"><strong>Authorized Use Only.</strong> RedForge must only be used on systems you own or have explicit written permission to test. Unauthorized testing is illegal and unethical. Always use <code>--authorization owned</code>, <code>authorized</code>, or <code>research</code> to acknowledge this.</div>
+    </div>
+
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>Python 3.10 or higher</li>
+      <li>An API key for your target LLM provider (or a local Ollama instance)</li>
+      <li>Authorization to test the target model</li>
+    </ul>
+
+    <h2>Installation</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># Basic install</span>
+pip install redforge
+
+<span class="hl-comment"># With specific provider</span>
+pip install "redforge[openai]"
+pip install "redforge[anthropic]"
+pip install "redforge[gemini]"
+pip install "redforge[bedrock]"
+pip install "redforge[mistral]"
+
+<span class="hl-comment"># All providers</span>
+pip install "redforge[all-providers]"
+
+<span class="hl-comment"># Development install</span>
+git clone https://github.com/yourorg/redforge
+cd redforge
+pip install -e ".[dev]"</code></pre>
+    </div>
+
+    <h2 id="first-scan">Your First Scan</h2>
+    <ol class="step-list">
+      <li class="step-item">
+        <span class="step-number">1</span>
+        <div class="step-content">
+          <h4>Set your API key</h4>
+          <p>RedForge loads API keys from environment variables — never from command-line arguments.</p>
+          <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+          <pre><code><span class="hl-keyword">export</span> OPENAI_API_KEY=<span class="hl-string">"sk-..."</span>
+<span class="hl-keyword">export</span> ANTHROPIC_API_KEY=<span class="hl-string">"sk-ant-..."</span>
+<span class="hl-keyword">export</span> GOOGLE_API_KEY=<span class="hl-string">"AIza..."</span></code></pre></div>
+        </div>
+      </li>
+      <li class="step-item">
+        <span class="step-number">2</span>
+        <div class="step-content">
+          <h4>List available probes</h4>
+          <p>See all 47 probes before running a scan.</p>
+          <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+          <pre><code>redforge list-probes</code></pre></div>
+        </div>
+      </li>
+      <li class="step-item">
+        <span class="step-number">3</span>
+        <div class="step-content">
+          <h4>Run a scan</h4>
+          <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+          <pre><code><span class="hl-comment"># Scan all 47 probes</span>
+redforge scan \
+  --provider openai \
+  --model gpt-4o \
+  --authorization research \
+  --format html \
+  --output ./report.html
+
+<span class="hl-comment"># Scan specific probes only</span>
+redforge scan \
+  --provider anthropic \
+  --model claude-opus-4-6 \
+  --authorization authorized \
+  --probes RF-001,RF-007,RF-011 \
+  --format json</code></pre></div>
+        </div>
+      </li>
+      <li class="step-item">
+        <span class="step-number">4</span>
+        <div class="step-content">
+          <h4>View results</h4>
+          <p>Open the generated HTML report in your browser, or parse the JSON output in your CI/CD pipeline.</p>
+          <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+          <pre><code><span class="hl-comment"># List saved reports</span>
+redforge report list
+
+<span class="hl-comment"># Render a specific report</span>
+redforge report show ./redforge-results/scan_20260325_143022.json</code></pre></div>
+        </div>
+      </li>
+    </ol>
+
+    <h2 id="output">Reading Scan Output</h2>
+    <p>After a scan completes, RedForge prints a summary table and saves detailed reports:</p>
+    <div class="terminal">
+      <div class="terminal-bar"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><span class="terminal-title">redforge output</span></div>
+      <div class="terminal-body">
+        <span class="terminal-line output">SCAN COMPLETE</span>
+        <span class="terminal-line output">═══════════════════════════════════════════════════</span>
+        <span class="terminal-line output">Provider : openai / gpt-4o</span>
+        <span class="terminal-line output">Probes   : 47 executed</span>
+        <span class="terminal-line output">Duration : 2m 34s</span>
+        <span class="terminal-line"> </span>
+        <span class="terminal-line err">✗ CRITICAL (3): RF-007, RF-036, RF-041</span>
+        <span class="terminal-line warn">⚠ HIGH    (6): RF-011, RF-029, RF-037, RF-042, RF-044, RF-046</span>
+        <span class="terminal-line warn">⚠ MEDIUM  (4): RF-022, RF-030, RF-039, RF-045</span>
+        <span class="terminal-line success">✓ PASS   (34): All others passed</span>
+        <span class="terminal-line"> </span>
+        <span class="terminal-line accent">Risk Score: 7.2 / 10.0  (HIGH)</span>
+        <span class="terminal-line output">CVSS-style: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N</span>
+        <span class="terminal-line"> </span>
+        <span class="terminal-line output">Reports saved:</span>
+        <span class="terminal-line dim">  ./redforge-results/scan_20260325.json</span>
+        <span class="terminal-line dim">  ./redforge-results/scan_20260325.html</span>
+        <span class="terminal-line dim">  ./redforge-results/scan_20260325.sarif</span>
+      </div>
+    </div>
+
+    <h2>Understanding Risk Scores</h2>
+    <p>Each probe returns a score from 0.0 (safe) to 1.0 (fully vulnerable). The overall risk score is a CVSS-inspired weighted aggregate:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risk Score</th><th>Severity</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>0.0 – 2.0</td><td><span class="badge badge-low">LOW</span></td><td>Model is mostly safe; minor issues only</td></tr>
+          <tr><td>2.1 – 5.0</td><td><span class="badge badge-medium">MEDIUM</span></td><td>Several concerning behaviors detected</td></tr>
+          <tr><td>5.1 – 7.5</td><td><span class="badge badge-high">HIGH</span></td><td>Multiple high-severity vulnerabilities</td></tr>
+          <tr><td>7.6 – 10.0</td><td><span class="badge badge-critical">CRITICAL</span></td><td>Severe vulnerabilities requiring immediate action</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Next Steps</h2>
+    <ul>
+      <li><a href="probes.html">Browse all 47 probes →</a></li>
+      <li><a href="configuration.html">Learn YAML configuration →</a></li>
+      <li><a href="api-reference.html">Integrate via REST API →</a></li>
+      <li><a href="python-sdk.html">Use the Python SDK →</a></li>
+      <li><a href="cli-reference.html">Full CLI reference →</a></li>
+    </ul>
+  </main>
+</div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

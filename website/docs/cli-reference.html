@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI Reference — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .cmd-section { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin:24px 0; overflow:hidden; }
+    .cmd-header { padding:16px 24px; background:rgba(239,68,68,0.05); border-bottom:1px solid var(--border); }
+    .cmd-name { font-family:var(--font-mono); font-size:1.1rem; color:var(--text-primary); font-weight:600; }
+    .cmd-desc { font-size:0.88rem; color:var(--text-secondary); margin-top:4px; }
+    .cmd-body { padding:24px; }
+    .option-row { display:flex; gap:16px; padding:10px 0; border-bottom:1px solid rgba(30,41,59,0.4); font-size:0.85rem; }
+    .option-row:last-child { border-bottom:none; }
+    .option-flag { font-family:var(--font-mono); color:var(--cyan); min-width:280px; flex-shrink:0; }
+    .option-type { font-family:var(--font-mono); color:var(--orange); min-width:80px; flex-shrink:0; }
+    .option-desc { color:var(--text-secondary); }
+    .option-default { font-family:var(--font-mono); font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+      <li><a href="cli-reference.html" class="active">CLI</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Getting Started</div>
+      <ul class="sidebar-nav">
+        <li><a href="getting-started.html">Introduction</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li><a href="configuration.html">Configuration</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">CLI Commands</div>
+      <ul class="sidebar-nav">
+        <li><a href="#scan" class="active">redforge scan</a></li>
+        <li><a href="#list-probes">redforge list-probes</a></li>
+        <li><a href="#report">redforge report</a></li>
+        <li><a href="#serve">redforge serve</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reference</div>
+      <ul class="sidebar-nav">
+        <li><a href="api-reference.html">REST API</a></li>
+        <li><a href="python-sdk.html">Python SDK</a></li>
+        <li><a href="configuration.html">YAML Config</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <a href="getting-started.html">Docs</a> › <span>CLI Reference</span></div>
+    <h1>CLI Reference</h1>
+    <p class="docs-lead">The <code>redforge</code> CLI provides four commands: <code>scan</code>, <code>list-probes</code>, <code>report</code>, and <code>serve</code>.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code>redforge --help
+
+<span class="hl-comment">  🔥 RedForge — LLM Red Teaming & Vulnerability Scanner
+
+  Commands:
+    scan         Run a vulnerability scan against a target LLM
+    list-probes  List all available probes
+    report       Manage and render saved scan reports
+    serve        Start the REST API server</span></code></pre>
+    </div>
+
+    <!-- redforge scan -->
+    <h2 id="scan">redforge scan</h2>
+    <p>Run a vulnerability scan against a target LLM. Requires <code>--authorization</code> to acknowledge you have permission to test the target.</p>
+
+    <div class="cmd-section">
+      <div class="cmd-header">
+        <div class="cmd-name">redforge scan [OPTIONS]</div>
+        <div class="cmd-desc">Run all or selected probes against a target LLM provider</div>
+      </div>
+      <div class="cmd-body">
+        <div class="option-row">
+          <div class="option-flag">--provider, -p TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">LLM provider. One of: <code>openai</code>, <code>anthropic</code>, <code>gemini</code>, <code>bedrock</code>, <code>azure</code>, <code>mistral</code>, <code>ollama</code>, <code>rest</code></div><div class="option-default">required</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--model, -m TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Model name/ID (e.g. <code>gpt-4o</code>, <code>claude-opus-4-6</code>). Uses provider default if omitted.</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--authorization, -a TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Authorization acknowledgment. <code>owned</code> | <code>authorized</code> | <code>research</code></div><div class="option-default">required</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--probes TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Comma-separated probe IDs. Default: all 47 probes. Example: <code>RF-001,RF-007,RF-011</code></div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--system-prompt TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">System prompt for the target model</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--format, -f TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Output format: <code>json</code> | <code>sarif</code> | <code>html</code> | <code>markdown</code></div><div class="option-default">default: markdown</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--output, -o PATH</div>
+          <div class="option-type">path</div>
+          <div><div class="option-desc">Save report to file. If omitted, prints to stdout.</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--config PATH</div>
+          <div class="option-type">path</div>
+          <div><div class="option-desc">Load scan configuration from YAML or JSON file (promptfoo-style config runner)</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--concurrency INTEGER</div>
+          <div class="option-type">int</div>
+          <div><div class="option-desc">Concurrent probe executions</div><div class="option-default">default: 3</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--dry-run</div>
+          <div class="option-type">flag</div>
+          <div><div class="option-desc">List probes that would run without executing them</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--no-store</div>
+          <div class="option-type">flag</div>
+          <div><div class="option-desc">Do not persist scan results to disk</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Examples</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># Full scan of all 47 probes</span>
+redforge scan --provider openai --model gpt-4o --authorization research
+
+<span class="hl-comment"># Critical probes only, save HTML report</span>
+redforge scan \
+  --provider anthropic \
+  --model claude-opus-4-6 \
+  --authorization authorized \
+  --probes RF-001,RF-007,RF-011,RF-038,RF-041,RF-042,RF-046 \
+  --format html \
+  --output report.html
+
+<span class="hl-comment"># Local Ollama model</span>
+redforge scan \
+  --provider ollama \
+  --model llama3.2 \
+  --authorization owned \
+  --format json
+
+<span class="hl-comment"># From YAML config file</span>
+redforge scan --config redforge.yaml
+
+<span class="hl-comment"># Dry run to preview probes</span>
+redforge scan --provider openai --authorization research --dry-run
+
+<span class="hl-comment"># Custom REST endpoint</span>
+<span class="hl-keyword">export</span> REST_API_URL=<span class="hl-string">"https://my-llm.example.com/v1/chat/completions"</span>
+<span class="hl-keyword">export</span> REST_API_KEY=<span class="hl-string">"my-key"</span>
+redforge scan --provider rest --authorization authorized</code></pre>
+    </div>
+
+    <!-- redforge list-probes -->
+    <h2 id="list-probes">redforge list-probes</h2>
+    <p>Display all available probes with their ID, severity, OWASP mapping, and description.</p>
+
+    <div class="cmd-section">
+      <div class="cmd-header">
+        <div class="cmd-name">redforge list-probes [OPTIONS]</div>
+        <div class="cmd-desc">List all 47 probes with metadata</div>
+      </div>
+      <div class="cmd-body">
+        <div class="option-row">
+          <div class="option-flag">--owasp TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Filter by OWASP LLM ID (e.g. <code>LLM01</code>)</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--severity TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Filter by severity: <code>critical</code> | <code>high</code> | <code>medium</code> | <code>low</code></div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--tag TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Filter by tag (e.g. <code>injection</code>, <code>jailbreak</code>)</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--json</div>
+          <div class="option-type">flag</div>
+          <div><div class="option-desc">Output as JSON for scripting</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># List all probes</span>
+redforge list-probes
+
+<span class="hl-comment"># Filter by OWASP category</span>
+redforge list-probes --owasp LLM01
+
+<span class="hl-comment"># Filter by severity</span>
+redforge list-probes --severity critical
+
+<span class="hl-comment"># JSON output</span>
+redforge list-probes --json | jq '.[].id'</code></pre>
+    </div>
+
+    <!-- redforge report -->
+    <h2 id="report">redforge report</h2>
+
+    <div class="cmd-section">
+      <div class="cmd-header">
+        <div class="cmd-name">redforge report SUBCOMMAND</div>
+        <div class="cmd-desc">Manage and render saved scan reports</div>
+      </div>
+      <div class="cmd-body">
+        <div class="option-row"><div class="option-flag">list</div><div class="option-type"></div><div class="option-desc">List all saved scan reports</div></div>
+        <div class="option-row"><div class="option-flag">show PATH</div><div class="option-type"></div><div class="option-desc">Render and display a specific report file</div></div>
+        <div class="option-row"><div class="option-flag">convert PATH --format TEXT</div><div class="option-type"></div><div class="option-desc">Convert a JSON report to another format (html, sarif, markdown)</div></div>
+        <div class="option-row"><div class="option-flag">delete PATH</div><div class="option-type"></div><div class="option-desc">Delete a saved report</div></div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># List all saved reports</span>
+redforge report list
+
+<span class="hl-comment"># Show a report in terminal</span>
+redforge report show ./redforge-results/scan_20260325.json
+
+<span class="hl-comment"># Convert to HTML</span>
+redforge report convert ./redforge-results/scan_20260325.json --format html
+
+<span class="hl-comment"># Convert to SARIF for GitHub</span>
+redforge report convert ./redforge-results/scan_20260325.json --format sarif</code></pre>
+    </div>
+
+    <!-- redforge serve -->
+    <h2 id="serve">redforge serve</h2>
+    <p>Start the FastAPI REST API server for programmatic access and CI/CD integration.</p>
+
+    <div class="cmd-section">
+      <div class="cmd-header">
+        <div class="cmd-name">redforge serve [OPTIONS]</div>
+        <div class="cmd-desc">Start the REST API server (FastAPI + uvicorn)</div>
+      </div>
+      <div class="cmd-body">
+        <div class="option-row">
+          <div class="option-flag">--host TEXT</div>
+          <div class="option-type">string</div>
+          <div><div class="option-desc">Bind host</div><div class="option-default">default: 127.0.0.1</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--port INTEGER</div>
+          <div class="option-type">int</div>
+          <div><div class="option-desc">Bind port</div><div class="option-default">default: 8000</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--reload</div>
+          <div class="option-type">flag</div>
+          <div><div class="option-desc">Auto-reload on code changes (development mode)</div></div>
+        </div>
+        <div class="option-row">
+          <div class="option-flag">--workers INTEGER</div>
+          <div class="option-type">int</div>
+          <div><div class="option-desc">Number of uvicorn worker processes</div><div class="option-default">default: 1</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># Start on default port 8000</span>
+redforge serve
+
+<span class="hl-comment"># Public-facing with auth</span>
+<span class="hl-keyword">export</span> REDFORGE_API_KEY=<span class="hl-string">"secure-secret-key"</span>
+redforge serve --host 0.0.0.0 --port 9000
+
+<span class="hl-comment"># Development with auto-reload</span>
+redforge serve --reload
+
+<span class="hl-comment"># API docs available at:</span>
+<span class="hl-comment"># http://localhost:8000/docs      (Swagger UI)</span>
+<span class="hl-comment"># http://localhost:8000/redoc     (ReDoc)</span></code></pre>
+    </div>
+
+    <h2>Environment Variables</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Variable</th><th>Description</th><th>Required</th></tr></thead>
+        <tbody>
+          <tr><td><code>OPENAI_API_KEY</code></td><td>OpenAI API key</td><td>For openai provider</td></tr>
+          <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Anthropic API key</td><td>For anthropic provider</td></tr>
+          <tr><td><code>GOOGLE_API_KEY</code></td><td>Google AI Studio API key</td><td>For gemini provider</td></tr>
+          <tr><td><code>AWS_ACCESS_KEY_ID</code></td><td>AWS credentials</td><td>For bedrock provider</td></tr>
+          <tr><td><code>AWS_SECRET_ACCESS_KEY</code></td><td>AWS credentials</td><td>For bedrock provider</td></tr>
+          <tr><td><code>AZURE_OPENAI_API_KEY</code></td><td>Azure OpenAI key</td><td>For azure provider</td></tr>
+          <tr><td><code>AZURE_OPENAI_ENDPOINT</code></td><td>Azure endpoint URL</td><td>For azure provider</td></tr>
+          <tr><td><code>MISTRAL_API_KEY</code></td><td>Mistral API key</td><td>For mistral provider</td></tr>
+          <tr><td><code>OLLAMA_BASE_URL</code></td><td>Ollama server URL</td><td>For ollama (default: localhost:11434)</td></tr>
+          <tr><td><code>REST_API_URL</code></td><td>Custom REST endpoint URL</td><td>For rest provider</td></tr>
+          <tr><td><code>REST_API_KEY</code></td><td>Custom REST API key</td><td>For rest provider</td></tr>
+          <tr><td><code>REDFORGE_API_KEY</code></td><td>RedForge server API key</td><td>For API server auth</td></tr>
+          <tr><td><code>REDFORGE_RESULTS_DIR</code></td><td>Results storage directory</td><td>Optional (default: ./redforge-results)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>CI/CD Integration</h2>
+    <p>Use SARIF output to integrate with GitHub Code Scanning:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy">Copy</button></div>
+      <pre><code><span class="hl-comment"># .github/workflows/llm-security.yml</span>
+<span class="hl-keyword">name</span>: LLM Security Scan
+<span class="hl-keyword">on</span>: [push, pull_request]
+
+<span class="hl-keyword">jobs</span>:
+  <span class="hl-keyword">redforge</span>:
+    <span class="hl-keyword">runs-on</span>: ubuntu-latest
+    <span class="hl-keyword">steps</span>:
+      - <span class="hl-keyword">uses</span>: actions/checkout@v4
+      - <span class="hl-keyword">name</span>: Install RedForge
+        <span class="hl-keyword">run</span>: pip install "redforge[openai]"
+      - <span class="hl-keyword">name</span>: Run LLM Security Scan
+        <span class="hl-keyword">env</span>:
+          <span class="hl-keyword">OPENAI_API_KEY</span>: ${{ secrets.OPENAI_API_KEY }}
+        <span class="hl-keyword">run</span>: |
+          redforge scan \
+            --provider openai \
+            --model gpt-4o \
+            --authorization research \
+            --format sarif \
+            --output results.sarif
+      - <span class="hl-keyword">name</span>: Upload SARIF to GitHub
+        <span class="hl-keyword">uses</span>: github/codeql-action/upload-sarif@v3
+        <span class="hl-keyword">with</span>:
+          <span class="hl-keyword">sarif_file</span>: results.sarif</code></pre>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

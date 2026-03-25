@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adapters (9 Providers) — RedForge Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo"><span class="logo-icon">🔥</span>RedForge</a>
+    <ul class="navbar-nav">
+      <li><a href="getting-started.html">Docs</a></li>
+      <li><a href="probes.html">Probes</a></li>
+      <li><a href="api-reference.html">API</a></li>
+      <li><a href="python-sdk.html">SDK</a></li>
+      <li><a href="cli-reference.html">CLI</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Adapters</div>
+      <ul class="sidebar-nav">
+        <li><a href="#openai">OpenAI</a></li>
+        <li><a href="#anthropic">Anthropic</a></li>
+        <li><a href="#gemini">Google Gemini</a></li>
+        <li><a href="#bedrock">AWS Bedrock</a></li>
+        <li><a href="#azure">Azure OpenAI</a></li>
+        <li><a href="#mistral">Mistral</a></li>
+        <li><a href="#ollama">Ollama (Local)</a></li>
+        <li><a href="#rest">Generic REST</a></li>
+        <li><a href="#custom">Custom Adapter</a></li>
+      </ul>
+    </div>
+  </aside>
+  <main class="docs-content">
+    <div class="docs-breadcrumb"><a href="../index.html">Home</a> › <a href="getting-started.html">Docs</a> › <span>Adapters</span></div>
+    <h1>Adapters — 9 LLM Providers</h1>
+    <p class="docs-lead">RedForge supports 9 LLM providers out of the box. Each adapter translates RedForge's standard probe messages into provider-specific API calls.</p>
+
+    <div class="provider-grid">
+      <div class="provider-card"><div class="provider-icon">🤖</div><h4>OpenAI</h4><p>GPT-4o, GPT-4, GPT-3.5</p></div>
+      <div class="provider-card"><div class="provider-icon">🧠</div><h4>Anthropic</h4><p>Claude 3.5, Claude 4.x</p></div>
+      <div class="provider-card"><div class="provider-icon">✨</div><h4>Google Gemini</h4><p>Gemini 1.5, 2.0 Flash</p></div>
+      <div class="provider-card"><div class="provider-icon">☁️</div><h4>AWS Bedrock</h4><p>Claude, Llama, Titan</p></div>
+      <div class="provider-card"><div class="provider-icon">🔷</div><h4>Azure OpenAI</h4><p>GPT-4o deployments</p></div>
+      <div class="provider-card"><div class="provider-icon">🌊</div><h4>Mistral</h4><p>Mistral Large, Small</p></div>
+      <div class="provider-card"><div class="provider-icon">🦙</div><h4>Ollama</h4><p>Local models</p></div>
+      <div class="provider-card"><div class="provider-icon">🔗</div><h4>Generic REST</h4><p>Any OpenAI-compat API</p></div>
+    </div>
+
+    <h2 id="openai">OpenAI</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[openai]"
+export OPENAI_API_KEY="sk-..."
+
+redforge scan --provider openai --model gpt-4o --authorization research</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.adapters.openai_adapter <span class="hl-keyword">import</span> OpenAIAdapter
+
+adapter = OpenAIAdapter(model=<span class="hl-string">"gpt-4o"</span>)
+<span class="hl-comment"># Also supports: gpt-4-turbo, gpt-3.5-turbo, gpt-4o-mini</span>
+<span class="hl-comment"># Also supports OpenAI-compatible APIs via base_url param</span>
+adapter_compat = OpenAIAdapter(
+    model=<span class="hl-string">"my-model"</span>,
+    base_url=<span class="hl-string">"https://my-openai-compat.example.com/v1"</span>,
+    api_key=<span class="hl-string">"my-key"</span>,
+)</code></pre></div>
+
+    <h2 id="anthropic">Anthropic</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[anthropic]"
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+redforge scan --provider anthropic --model claude-opus-4-6 --authorization research</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.adapters.anthropic_adapter <span class="hl-keyword">import</span> AnthropicAdapter
+
+adapter = AnthropicAdapter(model=<span class="hl-string">"claude-opus-4-6"</span>)
+<span class="hl-comment"># Also: claude-sonnet-4-6, claude-haiku-4-5-20251001</span></code></pre></div>
+
+    <h2 id="gemini">Google Gemini</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[gemini]"
+export GOOGLE_API_KEY="AIza..."
+
+redforge scan --provider gemini --model gemini-1.5-pro --authorization research</code></pre></div>
+
+    <h2 id="bedrock">AWS Bedrock</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[bedrock]"
+export AWS_ACCESS_KEY_ID="..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_DEFAULT_REGION="us-east-1"
+
+redforge scan --provider bedrock --model anthropic.claude-3-5-sonnet-20241022-v2:0 --authorization authorized</code></pre></div>
+
+    <h2 id="azure">Azure OpenAI</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[openai]"
+export AZURE_OPENAI_API_KEY="..."
+export AZURE_OPENAI_ENDPOINT="https://myresource.openai.azure.com/"
+export AZURE_OPENAI_DEPLOYMENT="gpt-4o-deployment"
+
+redforge scan --provider azure --model gpt-4o-deployment --authorization authorized</code></pre></div>
+
+    <h2 id="mistral">Mistral</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>pip install "redforge[mistral]"
+export MISTRAL_API_KEY="..."
+
+redforge scan --provider mistral --model mistral-large-latest --authorization research</code></pre></div>
+
+    <h2 id="ollama">Ollama (Local)</h2>
+    <p>Test locally-running models with zero API key requirements:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-comment"># Start Ollama (separate terminal)</span>
+ollama serve
+ollama pull llama3.2
+
+<span class="hl-comment"># Scan local model</span>
+redforge scan --provider ollama --model llama3.2 --authorization owned
+
+<span class="hl-comment"># Custom URL</span>
+export OLLAMA_BASE_URL="http://my-ollama-server:11434"
+redforge scan --provider ollama --model mistral --authorization owned</code></pre></div>
+
+    <h2 id="rest">Generic REST</h2>
+    <p>Connect to any OpenAI-compatible REST endpoint:</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+    <pre><code>export REST_API_URL="https://my-llm.example.com/v1/chat/completions"
+export REST_API_KEY="my-key"
+export REST_MODEL="my-model-name"
+
+redforge scan --provider rest --authorization authorized</code></pre></div>
+
+    <h2 id="custom">Writing a Custom Adapter</h2>
+    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+    <pre><code><span class="hl-keyword">from</span> redforge.adapters.base <span class="hl-keyword">import</span> BaseAdapter, AdapterResponse
+<span class="hl-keyword">import</span> time
+
+<span class="hl-keyword">class</span> <span class="hl-class">MyCustomAdapter</span>(BaseAdapter):
+    <span class="hl-keyword">def</span> <span class="hl-func">__init__</span>(self, my_client):
+        self.client = my_client
+
+    <span class="hl-keyword">async def</span> <span class="hl-func">send</span>(self, messages, **kwargs) -> AdapterResponse:
+        start = time.monotonic()
+        raw = <span class="hl-keyword">await</span> self.client.chat(messages)
+        latency = int((time.monotonic() - start) * <span class="hl-number">1000</span>)
+        <span class="hl-keyword">return</span> AdapterResponse(
+            content=raw.text,
+            model=<span class="hl-string">"my-model"</span>,
+            latency_ms=latency,
+            tokens_used=raw.usage.total_tokens,
+        )
+
+    <span class="hl-decorator">@classmethod</span>
+    <span class="hl-keyword">def</span> <span class="hl-func">from_config</span>(cls, config) -> <span class="hl-string">"MyCustomAdapter"</span>:
+        <span class="hl-keyword">return</span> cls(my_client=<span class="hl-class">MyClient</span>(config[<span class="hl-string">"api_key"</span>]))</code></pre></div>
+  </main>
+</div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

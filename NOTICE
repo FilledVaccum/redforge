@@ -1,0 +1,37 @@
+RedForge
+Copyright 2024 RedForge Contributors
+
+This product is licensed under the Apache License, Version 2.0.
+
+---
+
+This software was built from scratch as an original work.
+The following open-source tools were studied for architectural inspiration only.
+No code, datasets, or assets were copied from these projects.
+
+Third-party tools studied (inspiration only):
+- NVIDIA/garak (Apache 2.0) - https://github.com/NVIDIA/garak
+- promptfoo/promptfoo (MIT) - https://github.com/promptfoo/promptfoo
+- microsoft/PyRIT (MIT) - https://github.com/microsoft/PyRIT
+- protectai/llm-guard (MIT) - https://github.com/protectai/llm-guard
+- msoedov/agentic_security (MIT) - https://github.com/msoedov/agentic_security
+- cyberark/FuzzyAI (Apache 2.0) - https://github.com/cyberark/FuzzyAI
+- EasyJailbreak/EasyJailbreak (MIT) - https://github.com/EasyJailbreak/EasyJailbreak
+- NVIDIA-NeMo/Guardrails (Apache 2.0) - https://github.com/NVIDIA-NeMo/Guardrails
+
+---
+
+Third-party Python dependencies (see pyproject.toml for full list):
+All dependencies are Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, or ISC licensed.
+No GPL, LGPL, or AGPL dependencies are included.
+
+Key dependencies:
+- typer (MIT) - https://github.com/tiangolo/typer
+- fastapi (MIT) - https://github.com/tiangolo/fastapi
+- pydantic (MIT) - https://github.com/pydantic/pydantic
+- httpx (BSD-3-Clause) - https://github.com/encode/httpx
+- uvicorn (BSD-3-Clause) - https://github.com/encode/uvicorn
+- rich (MIT) - https://github.com/Textualize/rich
+- tenacity (Apache 2.0) - https://github.com/jd/tenacity
+- python-dotenv (BSD-3-Clause) - https://github.com/theskumar/python-dotenv
+- slowapi (MIT) - https://github.com/laurentS/slowapi
