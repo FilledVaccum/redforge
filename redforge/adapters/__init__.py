@@ -67,6 +67,7 @@ def get_adapter(provider: str, config: dict[str, Any] | None = None, **kwargs: A
             "bedrock": "anthropic.claude-3-5-sonnet-20241022-v2:0",
             "azure": "gpt-4o",
             "mistral": "mistral-large-latest",
+            "huggingface": "mistralai/Mistral-7B-Instruct-v0.3",
             "rest": "default",
         }
         merged["model"] = defaults.get(provider, "default")

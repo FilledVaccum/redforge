@@ -431,6 +431,95 @@ profiles:
     tags: [ollama, remote, free]
 
   # ════════════════════════════════════════════════════════════
+  # HuggingFace — any model on the Hub
+  # Env var: HF_TOKEN (required for gated models)
+  #   Get yours at: https://huggingface.co/settings/tokens
+  # Modes: inference_api | endpoint | tgi | local
+  # ════════════════════════════════════════════════════════════
+
+  # Serverless Inference API — any public model, no token needed for ungated
+  hf-mistral-7b:
+    description: "Mistral 7B Instruct via HuggingFace Inference API"
+    provider: huggingface
+    model: mistralai/Mistral-7B-Instruct-v0.3
+    tags: [huggingface, inference_api, free]
+
+  # Gated model (requires HF_TOKEN with gated access granted)
+  hf-llama-8b:
+    description: "Meta Llama 3.1 8B Instruct (gated — needs HF_TOKEN)"
+    provider: huggingface
+    model: meta-llama/Meta-Llama-3.1-8B-Instruct
+    tags: [huggingface, inference_api, llama]
+
+  hf-llama-70b:
+    description: "Meta Llama 3.1 70B Instruct (gated — needs HF_TOKEN)"
+    provider: huggingface
+    model: meta-llama/Meta-Llama-3.1-70B-Instruct
+    max_tokens: 1024
+    tags: [huggingface, inference_api, llama, large]
+
+  hf-deepseek-r1:
+    description: "DeepSeek R1 reasoning model via HuggingFace"
+    provider: huggingface
+    model: deepseek-ai/DeepSeek-R1
+    max_tokens: 2048
+    tags: [huggingface, inference_api, reasoning]
+
+  hf-qwen-72b:
+    description: "Qwen 2.5 72B Instruct via HuggingFace"
+    provider: huggingface
+    model: Qwen/Qwen2.5-72B-Instruct
+    max_tokens: 2048
+    tags: [huggingface, inference_api, large]
+
+  # Dedicated Inference Endpoint (your own hosted URL)
+  # Deploy at: https://ui.endpoints.huggingface.co
+  hf-endpoint:
+    description: "Custom HuggingFace Inference Endpoint"
+    provider: huggingface
+    model: meta-llama/Meta-Llama-3.1-8B-Instruct
+    mode: endpoint
+    base_url: https://YOUR-ENDPOINT-ID.us-east-1.aws.endpoints.huggingface.cloud
+    tags: [huggingface, endpoint, dedicated]
+
+  # Self-hosted TGI server (Text Generation Inference ≥ 2.0)
+  # docker run --gpus all -p 8080:80 ghcr.io/huggingface/text-generation-inference --model-id mistralai/Mistral-7B-Instruct-v0.3
+  hf-tgi-local:
+    description: "Self-hosted TGI server on localhost"
+    provider: huggingface
+    model: tgi
+    mode: tgi
+    base_url: http://localhost:8080
+    tags: [huggingface, tgi, self-hosted]
+
+  hf-tgi-remote:
+    description: "Remote TGI server on GPU instance"
+    provider: huggingface
+    model: tgi
+    mode: tgi
+    base_url: http://my-gpu-server:8080
+    tags: [huggingface, tgi, remote]
+
+  # Local pipeline — downloads weights, runs on this machine
+  # Requires: pip install "redforge[huggingface-local]"
+  hf-local-phi:
+    description: "Microsoft Phi-3.5 Mini running locally (CPU/MPS/CUDA)"
+    provider: huggingface
+    model: microsoft/Phi-3.5-mini-instruct
+    mode: local
+    device: auto
+    torch_dtype: bfloat16
+    tags: [huggingface, local, free, small]
+
+  hf-local-gemma:
+    description: "Google Gemma 2 2B running locally"
+    provider: huggingface
+    model: google/gemma-2-2b-it
+    mode: local
+    device: auto
+    tags: [huggingface, local, free, small]
+
+  # ════════════════════════════════════════════════════════════
   # Generic REST (any OpenAI-compatible endpoint)
   # Env var: REDFORGE_REST_API_KEY (optional)
   # ════════════════════════════════════════════════════════════

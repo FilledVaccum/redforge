@@ -94,6 +94,7 @@ _BUILTIN_REGISTRY: dict[str, str] = {
     "azure": "redforge.adapters.azure_adapter:AzureAdapter",
     "mistral": "redforge.adapters.mistral_adapter:MistralAdapter",
     "rest": "redforge.adapters.generic_rest_adapter:GenericRESTAdapter",
+    "huggingface": "redforge.adapters.huggingface_adapter:HuggingFaceAdapter",
 }
 
 
