@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Bebas+Neue&display=swap');
+
+/* ── Paper texture overlay ──────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.012;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+}
+
+/* ── Base ────────────────────────────────────────────────────── */
+@layer base {
+  html { -webkit-font-smoothing: antialiased; }
+  ::selection { background: #CC220022; }
+  :focus-visible { outline: 2px solid #CC2200; outline-offset: 2px; }
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #F3F0E8 inset !important;
+    -webkit-text-fill-color: #0D0D0A !important;
+  }
+}
+
+/* ── Utility extensions ──────────────────────────────────────── */
+@layer components {
+  .label-caps {
+    @apply font-mono text-3xs font-semibold tracking-caps uppercase text-ink-4;
+  }
+  .section-divider {
+    @apply border-t border-ink/[0.12];
+  }
+  .card {
+    @apply border border-ink/[0.12] bg-paper;
+  }
+  .card-padded {
+    @apply card p-6;
+  }
+  .badge {
+    @apply inline-flex items-center font-mono text-3xs font-semibold tracking-wide2 uppercase px-2 py-0.5 border;
+  }
+  .badge-critical { @apply text-red border-red bg-red/5; }
+  .badge-high     { @apply text-amber-700 border-amber-700 bg-amber-700/5; }
+  .badge-medium   { @apply text-yellow-700 border-yellow-700 bg-yellow-700/5; }
+  .badge-low      { @apply text-green-700 border-green-700 bg-green-700/5; }
+  .badge-pass     { @apply text-green-700 border-green-700 bg-green-700/5; }
+  .badge-fail     { @apply text-red border-red bg-red/5; }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 px-5 py-2.5 bg-ink text-paper font-mono text-2xs font-semibold tracking-caps uppercase border border-ink cursor-pointer transition-colors hover:bg-red hover:border-red;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-1.5 px-5 py-2.5 bg-transparent text-ink-3 font-mono text-2xs font-semibold tracking-caps uppercase border border-ink-4 cursor-pointer transition-colors hover:text-ink hover:border-ink;
+  }
+  .btn-danger {
+    @apply btn-primary bg-red border-red hover:bg-red-dark hover:border-red-dark;
+  }
+
+  .input-field {
+    @apply w-full bg-transparent border border-ink/[0.12] px-3 py-2.5 font-mono text-sm text-ink placeholder:text-ink-4 focus:border-ink/30 transition-colors;
+  }
+  .select-field {
+    @apply input-field appearance-none cursor-pointer;
+  }
+}
