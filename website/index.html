@@ -16,7 +16,7 @@
   <span class="c-sep">//</span>
   <span class="c-alert">Authorized Testing Only</span>
   <span class="c-sep">//</span>
-  <span>v0.1.0 · Apache 2.0</span>
+  <span>v0.4.0 · Apache 2.0</span>
   <span class="c-sep">//</span>
   <span>Document ID: RF-2025-001</span>
 </div>
@@ -64,7 +64,7 @@
 
       <div class="hero-sub">
         <p>RedForge automates adversarial security testing for large language models — mapping vulnerabilities across every OWASP LLM Top 10 category with evidence-grade output.</p>
-        <p>47 probes. 9 providers. Multi-turn attacks. YARA detection. Compliance reports. One command.</p>
+        <p>49+ probes. 10 providers. YAML declarative probes. Composable scorers. Plugin system. Multi-turn attacks. Compliance reports. One command.</p>
       </div>
 
       <div class="hero-install">
@@ -77,17 +77,17 @@
 
       <div class="hero-actions">
         <a href="docs/getting-started.html" class="btn-primary">Initiate Assessment →</a>
-        <a href="docs/probes.html" class="btn-ghost">Browse 47 Probes →</a>
+        <a href="docs/probes.html" class="btn-ghost">Browse 49+ Probes →</a>
       </div>
     </div>
 
     <aside class="hero-stats">
       <div class="stat-block">
-        <span class="stat-num" data-target="47">0</span>
+        <span class="stat-num" data-target="49">0</span>
         <span class="stat-label">Security<br>Probes</span>
       </div>
       <div class="stat-block">
-        <span class="stat-num" data-target="9">0</span>
+        <span class="stat-num" data-target="10">0</span>
         <span class="stat-label">LLM<br>Providers</span>
       </div>
       <div class="stat-block stat-block--accent">
@@ -113,15 +113,15 @@
   <div class="feat-grid">
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-001</span>
-      <div class="feat-name">47 Attack Probes</div>
-      <p class="feat-body">Full OWASP LLM Top 10 coverage. Every probe carries MITRE ATLAS technique mappings, CVSSv3-style scoring, and remediation guidance. From prompt injection to MCP tool poisoning.</p>
-      <div class="feat-tags"><span class="ftag">OWASP LLM01–10</span><span class="ftag">MITRE ATLAS</span></div>
+      <div class="feat-name">49+ Attack Probes</div>
+      <p class="feat-body">Full OWASP LLM Top 10 coverage. Every probe carries MITRE ATLAS technique mappings, CVSSv3-style scoring, and remediation guidance. Add new probes as YAML files — no Python required.</p>
+      <div class="feat-tags"><span class="ftag">OWASP LLM01–10</span><span class="ftag">MITRE ATLAS</span><span class="ftag">YAML-extensible</span></div>
     </div>
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-002</span>
-      <div class="feat-name">9 Provider Adapters</div>
-      <p class="feat-body">OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure OpenAI, Mistral, Ollama. Add a generic REST adapter for any endpoint. Zero-config local scanning with Ollama.</p>
-      <div class="feat-tags"><span class="ftag">OpenAI</span><span class="ftag">Anthropic</span><span class="ftag">Bedrock</span><span class="ftag">+6</span></div>
+      <div class="feat-name">10 Provider Adapters</div>
+      <p class="feat-body">OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure OpenAI, Mistral, Ollama, HuggingFace Hub (any of millions of models), and generic REST. Plugin system for custom providers.</p>
+      <div class="feat-tags"><span class="ftag">OpenAI</span><span class="ftag">Anthropic</span><span class="ftag">HuggingFace</span><span class="ftag">+7</span></div>
     </div>
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-003</span>
@@ -161,9 +161,27 @@
     </div>
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-009</span>
-      <div class="feat-name">4 Output Formats</div>
-      <p class="feat-body">JSON for CI/CD. SARIF 2.1.0 for GitHub Code Scanning. HTML for stakeholder reports. Markdown for docs. All sanitized — no raw model output rendered directly in HTML.</p>
-      <div class="feat-tags"><span class="ftag">SARIF</span><span class="ftag">JSON</span><span class="ftag">HTML</span><span class="ftag">Markdown</span></div>
+      <div class="feat-name">6 Output Formats</div>
+      <p class="feat-body">JSON, SARIF 2.1.0, HTML, Markdown, Audit JSONL (full payload+response log), and Failures JSON (guardrail pipeline import). All sanitized — no raw model output in HTML.</p>
+      <div class="feat-tags"><span class="ftag">SARIF</span><span class="ftag">JSONL</span><span class="ftag">HTML</span><span class="ftag">Markdown</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-010</span>
+      <div class="feat-name">YAML Declarative Probes</div>
+      <p class="feat-body">Define complete probes in YAML — id, OWASP category, severity, payloads, and scorer config. Drop a .yaml file in probes/datasets/ or ~/.redforge/probes/ and it auto-registers. No Python, no edits to existing files.</p>
+      <div class="feat-tags"><span class="ftag">Zero Python</span><span class="ftag">Auto-discovered</span><span class="ftag">Community-friendly</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-011</span>
+      <div class="feat-name">Composable Scorers</div>
+      <p class="feat-body">RefusalScorer, KeywordScorer, RegexScorer, LengthScorer, ScorerChain — chainable building blocks for probe scoring. YAML probes declare scorer config inline. LLM-as-Judge scorer for nuanced harm detection.</p>
+      <div class="feat-tags"><span class="ftag">Chainable</span><span class="ftag">LLM Judge</span><span class="ftag">No Boilerplate</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-012</span>
+      <div class="feat-name">Plugin Extension System</div>
+      <p class="feat-body">Publish a pip package with redforge.probes, redforge.adapters, or redforge.reporters entry points — it auto-registers on install. Compliance frameworks as YAML: drop a file in ~/.redforge/compliance/ to add HIPAA, SOC2, or any internal policy.</p>
+      <div class="feat-tags"><span class="ftag">Entry Points</span><span class="ftag">pip install</span><span class="ftag">Compliance YAML</span></div>
     </div>
   </div>
 </section>
@@ -301,21 +319,24 @@ docker run --rm \
         <div id="t-yaml" class="tab-panel">
           <div class="code-block">
             <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy">Copy</button></div>
-            <pre><code><span class="hl-comment"># redforge.yaml</span>
+            <pre><code><span class="hl-comment"># redforge.yaml — auto-discovered in project root</span>
 <span class="hl-keyword">provider</span>: openai
 <span class="hl-keyword">model</span>: gpt-4o
 <span class="hl-keyword">authorization</span>: owned
 <span class="hl-keyword">compliance</span>: [NIST_AI_RMF, EU_AI_ACT]
-<span class="hl-keyword">attacks</span>:
-  <span class="hl-keyword">pair</span>: true
-  <span class="hl-keyword">mutation_strategies</span>: [base64, leetspeak]
+<span class="hl-keyword">probes</span>:
+  - RF-001-prompt-injection
+  - community_prompt_injection_extended
+  - my_custom_yaml_probe
 <span class="hl-keyword">output</span>:
   <span class="hl-keyword">formats</span>: [html, sarif, json]
   <span class="hl-keyword">directory</span>: ./results</code></pre>
           </div>
           <div class="code-block">
             <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
-            <pre><code>redforge run redforge.yaml</code></pre>
+            <pre><code><span class="hl-comment"># CLI flags override config values</span>
+redforge scan               <span class="hl-comment"># auto-discovers redforge.yaml</span>
+redforge scan --config ci.yaml  <span class="hl-comment"># explicit path</span></code></pre>
           </div>
         </div>
 
@@ -347,8 +368,8 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
         <div class="terminal-body">
           <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">redforge scan --provider openai --model gpt-4o --authorization owned</span></div>
           <div class="t-blank"></div>
-          <div class="t-line"><span class="t-out">  RedForge v0.1.0 · LLM Vulnerability Scanner</span></div>
-          <div class="t-line"><span class="t-out">  Provider: openai/gpt-4o · 47 probes loaded</span></div>
+          <div class="t-line"><span class="t-out">  RedForge v0.4.0 · LLM Vulnerability Scanner</span></div>
+          <div class="t-line"><span class="t-out">  Provider: openai/gpt-4o · 49 probes loaded (47 Python + 2 YAML)</span></div>
           <div class="t-blank"></div>
           <div class="t-line"><span class="t-dim">  ── LLM01: Prompt Injection ─────────────────</span></div>
           <div class="t-line"><span class="t-ok">  ✓ RF-001 direct-injection</span><span class="t-dim"> ..... PASS (0.04)</span></div>
@@ -364,7 +385,7 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
           <div class="t-line"><span class="t-out">  ... 40 more probes ...</span></div>
           <div class="t-blank"></div>
           <div class="t-line"><span class="t-dim">  ────────────────────────────────────────────</span></div>
-          <div class="t-line"><span class="t-accent">  COMPLETE · 47 probes · 2 CRITICAL · 4 HIGH · 41 PASS</span></div>
+          <div class="t-line"><span class="t-accent">  COMPLETE · 49 probes · 2 CRITICAL · 4 HIGH · 43 PASS</span></div>
           <div class="t-line"><span class="t-fail">  Risk Score: 7.4/10 · Level: HIGH</span></div>
           <div class="t-line"><span class="t-ok">  Report: ./redforge-results/scan_20260325.html</span></div>
           <div class="t-blank"></div>
@@ -406,7 +427,7 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
         </tr>
         <tr>
           <td class="td-label">Security probe count</td>
-          <td class="td-self"><span class="c-yes">47</span></td>
+          <td class="td-self"><span class="c-yes">49+ (growing)</span></td>
           <td><span class="c-par">~44 files</span></td>
           <td><span class="c-par">~20</span></td>
           <td><span class="c-par">~15</span></td>
@@ -501,6 +522,30 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
           <td><span class="c-no">✕</span></td>
         </tr>
         <tr>
+          <td class="td-label">YAML declarative probes (no Python)</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Plugin system (pip install)</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Compliance frameworks as YAML</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
           <td class="td-label">License</td>
           <td class="td-self">Apache 2.0</td>
           <td>Apache 2.0</td>
@@ -539,8 +584,8 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
         <p>Production-grade LLM Red Teaming & Vulnerability Scanner. Apache 2.0 licensed. For authorized testing only.</p>
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap">
           <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">Apache 2.0</span>
-          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">47 Probes</span>
-          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">9 Providers</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">49+ Probes</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">10 Providers</span>
         </div>
       </div>
       <div>

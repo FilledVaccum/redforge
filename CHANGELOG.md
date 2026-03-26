@@ -10,6 +10,66 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.0] - 2026-03-26
+
+### Added — Extensibility & Ecosystem Features
+
+**`redforge/probes/datasets/*.yaml`** — YAML declarative probe system
+- Complete probe definitions in YAML: `id`, `owasp_id`, `severity`, `payloads`, `score` config
+- Auto-discovered by `probes/__init__.py` alongside Python probes — no registration
+- User probes: drop YAML in `~/.redforge/probes/` — picked up without touching the package
+- `redforge/probes/yaml_probe.py` — `make_yaml_probe_class()` dynamically creates `BaseProbe` subclasses from YAML specs; `discover_yaml_probes()` scans both built-in and user directories
+- Two community probe datasets ship built-in:
+  - `community_prompt_injection_extended` — 15 payloads (XML tag confusion, Unicode tricks, tool call injection, sycophancy framing)
+  - `community_jailbreak_framing` — 11 payloads (persona adoption, hypothetical framing, authority override, philosophical bypass)
+- **Total: 47 Python + 2 YAML = 49 probes** at launch; grows via YAML with no code changes
+
+**`redforge/scoring/scorers.py`** — composable scorer building blocks
+- `BaseScorer` abstract base; subclass to add a scorer type, no registration
+- `RefusalScorer` — fires on configurable refusal signal list; returns 0.0 on match
+- `KeywordScorer` — fires on explicit success marker keywords; configurable match/no-match scores
+- `RegexScorer` — fires on regex pattern match with configurable flags
+- `LengthScorer` — scores based on response length (short → likely refusal, long → likely compliance)
+- `NotScorer` — inverts any scorer's result (score → 1.0 − score)
+- `ScorerChain` — two modes: `first_match` (first matched scorer wins) and `weighted_average`
+- `build_scorer_from_config(dict)` — instantiate any scorer from a YAML/dict config block; used by YAML probes
+
+**Entry Points Plugin System** (`pyproject.toml` + all three registries)
+- Four extension groups declared: `redforge.probes`, `redforge.adapters`, `redforge.reporters`, `redforge.scorers`
+- `probes/__init__.py` — third discovery source after Python modules and YAML files
+- `reporters/__init__.py` — second discovery source after package scan
+- `adapters/factory.py` — `_load_plugin_adapters()` merges plugin entries on demand (lazy, hot-load)
+- Install a plugin package → its probes/adapters/reporters auto-register at next import
+- Example: `pip install redforge-probes-medical` → `redforge list-probes` shows medical probes
+
+**`redforge.yaml` auto-discovery** (`cli/commands.py`)
+- `scan` command now auto-discovers `./redforge.yaml` → `./redforge.yml` → `~/.redforge/config.yaml`
+- New `--config / -c` flag for explicit config file path
+- CLI flags override config file values (CLI wins at every field)
+- `redforge.yaml.example` — comprehensive reference template covering all config options
+- Config file loading uses existing `config/runner.py` `YAMLConfigRunner` (already fully implemented)
+
+**`redforge/compliance/frameworks/*.yaml`** — compliance frameworks as YAML
+- `nist_ai_rmf.yaml` — NIST AI RMF 1.0: all 10 OWASP LLM categories mapped across GOVERN/MAP/MEASURE/MANAGE
+- `eu_ai_act.yaml` — EU AI Act 2024/1689: Art. 9, 10, 13, 14, 15, 50, 53 mapped to LLM categories
+- `iso_42001.yaml` — ISO/IEC 42001:2023: clauses 6.1.2, 8.4 and Annex A.3–A.7 mapped
+- `redforge/compliance/framework_loader.py` — YAML framework registry with user override support:
+  - Built-in frameworks loaded from `redforge/compliance/frameworks/*.yaml`
+  - User overrides loaded from `~/.redforge/compliance/*.yaml` (same `framework_id` wins)
+  - `list_frameworks()`, `get_framework()`, `reload_frameworks()`, `map_findings_to_compliance_yaml()`
+- `compliance/mappings.py` updated — delegates to YAML loader first, Python dicts as silent fallback
+- Add HIPAA, SOC2, or any internal policy: drop one YAML file, zero Python
+
+### Changed
+- `probes/__init__.py` — discovery now has three sources: Python modules → YAML datasets → entry points; duplicate IDs warned and skipped
+- `reporters/__init__.py` — discovery now includes entry point plugins after package scan
+- `adapters/factory.py` — error message now mentions entry point alternative to `register()`
+- `scoring/__init__.py` — now exports all composable scorers alongside `LLMJudgeScorer`
+- `pyproject.toml` — added `pyyaml>=6.0,<7.0` as core dependency (was optional import in config/runner.py)
+- `cli/commands.py` — `scan` command: `--provider` and `--authorization` now optional (can come from `redforge.yaml`)
+
+---
+
 ## [0.3.0] - 2026-03-26
 
 ### Added — Modular Extensibility Refactor
