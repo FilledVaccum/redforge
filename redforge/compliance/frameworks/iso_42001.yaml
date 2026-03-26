@@ -1,0 +1,95 @@
+# ISO/IEC 42001:2023 — AI Management System — RedForge Compliance Mapping
+#
+# Source: https://www.iso.org/standard/81230.html
+# To customize: copy to ~/.redforge/compliance/iso_42001.yaml
+
+framework_id: ISO_42001
+name: "ISO/IEC 42001:2023 Artificial Intelligence Management System"
+version: "2023"
+url: https://www.iso.org/standard/81230.html
+description: >
+  International standard specifying requirements for establishing, implementing,
+  maintaining, and continually improving an AI management system within an organization.
+
+mappings:
+  LLM01:
+    - control_id: "6.1.2"
+      control_name: AI Risk Assessment
+      description: >
+        The organization shall assess AI risks, including adversarial attacks
+        and unintended uses, and determine the significance of these risks.
+      severity: high
+      remediation: >
+        Include prompt injection in the AI risk register per clause 6.1.2.
+        Document likelihood and impact of injection attacks. Update risk
+        assessment when new injection techniques are discovered.
+
+    - control_id: "8.4"
+      control_name: AI System Operation
+      description: >
+        The organization shall plan, implement, control, monitor and review
+        processes needed for the operation of AI systems, including security
+        controls against adversarial inputs.
+      severity: high
+      remediation: >
+        Implement input validation controls as part of AI system operational
+        procedures. Document testing cadence for injection attack resilience.
+
+  LLM02:
+    - control_id: "A.3"
+      control_name: Data for AI Systems
+      description: >
+        Controls for data quality, data privacy, and data protection in the
+        context of AI systems, including personal data used in training.
+      severity: critical
+      remediation: >
+        Implement controls per Annex A.3 to prevent sensitive data disclosure.
+        Establish data classification and output review procedures.
+
+  LLM06:
+    - control_id: "A.6"
+      control_name: AI System Deployment
+      description: >
+        Controls for safe and responsible deployment of AI systems, including
+        restrictions on scope, permissions, and autonomous actions.
+      severity: critical
+      remediation: >
+        Define agent boundaries and capabilities per Annex A.6. Implement
+        technical controls to enforce scope restrictions. Document all
+        permitted and prohibited agent actions.
+
+  LLM09:
+    - control_id: "A.7"
+      control_name: Responsible AI
+      description: >
+        Controls ensuring AI systems operate in a responsible manner including
+        accuracy, non-discrimination, and non-deception requirements.
+      severity: medium
+      remediation: >
+        Document known hallucination behaviors and failure modes. Implement
+        accuracy monitoring per Annex A.7. Provide users with information
+        about AI output reliability.
+
+  LLM04:
+    - control_id: "A.5"
+      control_name: AI System Lifecycle
+      description: >
+        Controls across the AI system lifecycle including supply chain
+        security and third-party component management.
+      severity: high
+      remediation: >
+        Establish AI supply chain controls. Track all third-party model
+        components and datasets. Implement integrity verification for
+        all AI system components.
+
+  LLM05:
+    - control_id: "A.4"
+      control_name: AI System Impact Assessment
+      description: >
+        Procedures for assessing the impact of AI system outputs,
+        including unintended or harmful outputs.
+      severity: high
+      remediation: >
+        Implement output scanning before delivery to end users.
+        Define acceptable output quality thresholds. Establish feedback
+        loops for reporting harmful AI outputs.

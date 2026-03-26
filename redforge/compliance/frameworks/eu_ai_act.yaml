@@ -1,0 +1,112 @@
+# EU AI Act (Regulation 2024/1689) — RedForge Compliance Mapping
+#
+# Source: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202401689
+# Applies to: high-risk AI systems and GPAI models deployed in the EU.
+# To customize: copy to ~/.redforge/compliance/eu_ai_act.yaml
+
+framework_id: EU_AI_ACT
+name: EU Artificial Intelligence Act (2024/1689)
+version: "2024"
+url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ:L_202401689
+description: >
+  EU Regulation establishing harmonized rules for AI systems, with specific
+  requirements for high-risk AI systems and general-purpose AI (GPAI) models.
+
+mappings:
+  LLM01:
+    - control_id: "Art. 9"
+      control_name: Risk Management System
+      description: >
+        High-risk AI systems must establish, implement, document and maintain
+        a risk management system throughout the entire lifecycle.
+      severity: high
+      remediation: >
+        Document prompt injection risks in the AI system risk register per
+        Art. 9(2). Include adversarial attack scenarios in risk assessments.
+        Review and update risk assessments when the system is modified.
+
+    - control_id: "Art. 15"
+      control_name: Robustness and Security
+      description: >
+        High-risk AI systems must achieve an appropriate level of accuracy,
+        robustness and cybersecurity and perform consistently throughout
+        their lifecycle. Must be resilient to attempts to alter their use
+        or performance by malicious third parties.
+      severity: critical
+      remediation: >
+        Implement adversarial testing as part of the conformity assessment
+        under Art. 15(4). Document resilience to prompt injection attacks.
+        Include red-team testing results in technical documentation.
+
+  LLM02:
+    - control_id: "Art. 10"
+      control_name: Data and Data Governance
+      description: >
+        Training, validation and testing datasets for high-risk AI systems
+        must be free of errors and complete with regard to the intended
+        purpose, and comply with data protection law.
+      severity: critical
+      remediation: >
+        Audit for PII in training data. Apply GDPR Art. 5 principles to model
+        training datasets. Implement training data inventory and lineage tracking.
+
+    - control_id: "GDPR Art. 5"
+      control_name: Data Minimisation
+      description: >
+        Personal data must be adequate, relevant and limited to what is
+        necessary in relation to the purposes for which they are processed.
+      severity: critical
+      remediation: >
+        Implement output filtering to prevent disclosure of personal data
+        memorized during training. Deploy PII detection on all model outputs.
+
+  LLM05:
+    - control_id: "Art. 13"
+      control_name: Transparency and Provision of Information
+      description: >
+        High-risk AI systems must be designed and developed in a way that
+        ensures their operation is sufficiently transparent to enable users
+        to interpret the system's output and use it appropriately.
+      severity: high
+      remediation: >
+        Document that AI-generated code has not been safety-checked and
+        requires human review before execution. Display appropriate warnings
+        in user interfaces.
+
+  LLM06:
+    - control_id: "Art. 14"
+      control_name: Human Oversight
+      description: >
+        High-risk AI systems must be designed and developed in such a way
+        that they can be effectively overseen by natural persons during the
+        period in which the AI system is in use.
+      severity: critical
+      remediation: >
+        Implement human-in-the-loop controls for autonomous agent actions.
+        Maintain audit trails for all agent actions per Art. 14(4).
+        Provide mechanisms for operators to intervene and override.
+
+  LLM09:
+    - control_id: "Art. 50"
+      control_name: GPAI Model Transparency
+      description: >
+        Providers of general-purpose AI models must ensure transparency
+        about the model's capabilities and limitations, including known
+        tendencies to produce inaccurate outputs.
+      severity: high
+      remediation: >
+        Disclose known hallucination rates in model cards and user documentation.
+        Implement uncertainty quantification. Require citation or grounding
+        for factual claims.
+
+  LLM04:
+    - control_id: "Art. 53"
+      control_name: GPAI Model Obligations
+      description: >
+        Providers of GPAI models must maintain technical documentation
+        including information about training data and risk mitigations.
+      severity: high
+      remediation: >
+        Maintain comprehensive training data documentation. Document all
+        known risks including supply chain dependencies. Implement model
+        watermarking where technically feasible.

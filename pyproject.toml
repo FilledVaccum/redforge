@@ -42,6 +42,8 @@ dependencies = [
     # Utilities
     "tenacity>=8.3.0,<10.0",
     "click>=8.1.0,<9.0",
+    # YAML: probe datasets, compliance frameworks, project config
+    "pyyaml>=6.0,<7.0",
 ]
 
 [project.optional-dependencies]
@@ -72,6 +74,35 @@ dev = [
 
 [project.scripts]
 redforge = "redforge.cli.commands:app"
+
+# ---------------------------------------------------------------------------
+# Plugin entry points — third-party packages use these groups to extend RedForge
+# without modifying this package.
+#
+# Example pyproject.toml for a plugin package:
+#   [project.entry-points."redforge.probes"]
+#   my_probe = "mypackage.probes:MyProbeClass"
+#
+#   [project.entry-points."redforge.adapters"]
+#   myprovider = "mypackage.adapters:MyAdapter"
+#
+#   [project.entry-points."redforge.reporters"]
+#   myformat = "mypackage.reporters:MyReporter"
+#
+#   [project.entry-points."redforge.scorers"]
+#   mymethod = "mypackage.scorers:MyScorer"
+# ---------------------------------------------------------------------------
+[project.entry-points."redforge.probes"]
+# (built-in probes are auto-discovered via pkgutil; no entries needed here)
+
+[project.entry-points."redforge.adapters"]
+# (built-in adapters registered via _BUILTIN_REGISTRY; no entries needed here)
+
+[project.entry-points."redforge.reporters"]
+# (built-in reporters are auto-discovered via pkgutil; no entries needed here)
+
+[project.entry-points."redforge.scorers"]
+# (built-in scorers imported directly; no registration needed)
 
 [project.urls]
 Homepage = "https://github.com/redforge/redforge"

@@ -24,6 +24,7 @@ Usage::
 from __future__ import annotations
 
 import importlib
+import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -98,8 +99,35 @@ _BUILTIN_REGISTRY: dict[str, str] = {
 }
 
 
+def _load_plugin_adapters() -> dict[str, str]:
+    """Load adapter entry points from installed plugin packages.
+
+    Plugin packages declare adapters with:
+        [project.entry-points."redforge.adapters"]
+        myprovider = "mypackage.adapters:MyAdapter"
+
+    Returns:
+        Dict of provider_name → "module:ClassName" strings, same format
+        as _BUILTIN_REGISTRY.
+    """
+    plugin_entries: dict[str, str] = {}
+    try:
+        from importlib.metadata import entry_points
+        for ep in entry_points(group="redforge.adapters"):
+            plugin_entries[ep.name] = ep.value
+    except Exception as exc:  # noqa: BLE001
+        logging.getLogger(__name__).debug("Entry point adapter discovery failed: %s", exc)
+    return plugin_entries
+
+
 class AdapterFactory:
-    """Central factory for creating adapters with full flexibility."""
+    """Central factory for creating adapters with full flexibility.
+
+    Provider resolution order:
+      1. _custom_registry (runtime-registered via AdapterFactory.register())
+      2. Plugin entry points (installed packages declaring redforge.adapters)
+      3. _BUILTIN_REGISTRY (built-in providers)
+    """
 
     _registry: dict[str, str] = dict(_BUILTIN_REGISTRY)
     _custom_registry: dict[str, type[BaseAdapter]] = {}
@@ -112,7 +140,7 @@ class AdapterFactory:
     def _load_class(cls, provider: str) -> type[BaseAdapter]:
         """Lazy-load an adapter class by provider name.
 
-        Checks the custom registry first, then the built-in registry.
+        Checks registries in priority order: custom → plugin → built-in.
 
         Args:
             provider: Provider name, e.g. 'openai'.
@@ -128,17 +156,23 @@ class AdapterFactory:
         if provider in cls._custom_registry:
             return cls._custom_registry[provider]
 
-        if provider not in cls._registry:
+        # Merge plugin entries on-demand (lazy, so plugin installs are picked
+        # up without restarting the process)
+        plugin_registry = _load_plugin_adapters()
+        combined = {**cls._registry, **plugin_registry}
+
+        if provider not in combined:
             available = sorted(
-                set(cls._registry.keys()) | set(cls._custom_registry.keys())
+                set(combined.keys()) | set(cls._custom_registry.keys())
             )
             raise ValueError(
                 f"No adapter registered for provider '{provider}'. "
                 f"Available providers: {', '.join(available)}. "
-                "Use AdapterFactory.register() to add a custom adapter."
+                "Use AdapterFactory.register() to add a custom adapter, or "
+                "install a plugin package that declares a 'redforge.adapters' entry point."
             )
 
-        module_path, class_name = cls._registry[provider].split(":", 1)
+        module_path, class_name = combined[provider].split(":", 1)
         module = importlib.import_module(module_path)
         adapter_cls: type[BaseAdapter] = getattr(module, class_name)
         return adapter_cls

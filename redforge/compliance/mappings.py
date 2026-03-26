@@ -290,12 +290,16 @@ ISO_42001_MAP: dict[str, list[dict[str, str]]] = {
 def map_findings_to_compliance(
     failed_owasp_ids: list[str],
     frameworks: list[str] | None = None,
+    prefer_yaml: bool = True,
 ) -> ComplianceResult:
     """Map failed probe OWASP IDs to compliance violations.
 
     Args:
         failed_owasp_ids: List of OWASP LLM IDs that had failing probes.
-        frameworks: Frameworks to assess. Defaults to all three.
+        frameworks:       Frameworks to assess. Defaults to all three built-ins
+                          plus any user-installed YAML frameworks.
+        prefer_yaml:      Use YAML framework loader (default True).
+                          Set False to use only the hardcoded Python dicts.
 
     Returns:
         ComplianceResult with violations per framework.
@@ -303,13 +307,51 @@ def map_findings_to_compliance(
     if frameworks is None:
         frameworks = ["NIST_AI_RMF", "EU_AI_ACT", "ISO_42001"]
 
+    # Try YAML loader first — it supports user-installed frameworks and
+    # produces identical results for the three built-in frameworks.
+    if prefer_yaml:
+        try:
+            from redforge.compliance.framework_loader import (
+                list_frameworks,
+                map_findings_to_compliance_yaml,
+            )
+            # Use YAML-known frameworks; keep any extras the caller specified
+            yaml_frameworks = list_frameworks()
+            effective_frameworks = [f for f in frameworks if f in yaml_frameworks]
+            # Fall back to Python dicts for any framework not in YAML
+            yaml_only_frameworks = effective_frameworks or frameworks
+
+            result_dict = map_findings_to_compliance_yaml(
+                failed_owasp_ids, yaml_only_frameworks
+            )
+            violations = [
+                ComplianceViolation(
+                    framework=v["framework"],
+                    control_id=v["control_id"],
+                    control_name=v["control_name"],
+                    description=v["description"],
+                    severity=v["severity"],
+                    remediation=v["remediation"],
+                )
+                for v in result_dict["violations"]
+            ]
+            return ComplianceResult(
+                frameworks_assessed=result_dict["frameworks_assessed"],
+                violations=violations,
+                compliant_controls=result_dict["compliant_controls"],
+                total_controls=result_dict["total_controls"],
+            )
+        except Exception:  # noqa: BLE001
+            pass  # Fall through to hardcoded Python dicts
+
+    # Fallback: hardcoded Python dicts (always available, no yaml dep needed)
     framework_maps = {
         "NIST_AI_RMF": NIST_AIRF_MAP,
         "EU_AI_ACT": EU_AI_ACT_MAP,
         "ISO_42001": ISO_42001_MAP,
     }
 
-    violations: list[ComplianceViolation] = []
+    violations_list: list[ComplianceViolation] = []
     total_controls = 0
 
     for fw_name in frameworks:
@@ -318,7 +360,7 @@ def map_findings_to_compliance(
             total_controls += len(controls)
             if owasp_id in failed_owasp_ids:
                 for ctrl in controls:
-                    violations.append(
+                    violations_list.append(
                         ComplianceViolation(
                             framework=fw_name,
                             control_id=ctrl["control_id"],
@@ -329,10 +371,10 @@ def map_findings_to_compliance(
                         )
                     )
 
-    compliant = total_controls - len(violations)
+    compliant = total_controls - len(violations_list)
     return ComplianceResult(
         frameworks_assessed=frameworks,
-        violations=violations,
+        violations=violations_list,
         compliant_controls=max(0, compliant),
         total_controls=total_controls,
     )

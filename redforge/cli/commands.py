@@ -58,26 +58,103 @@ def _format_help(context: str = "Output") -> str:
         return f"{context} format: json | sarif | html | markdown"
 
 
+def _load_project_config(config_path: Path | None) -> dict | None:
+    """Load redforge.yaml config, searching standard locations if path is None.
+
+    Search order:
+      1. --config flag value (explicit path)
+      2. ./redforge.yaml
+      3. ./redforge.yml
+      4. ~/.redforge/config.yaml
+
+    Returns the raw config dict or None if no config file found.
+    """
+    candidates: list[Path] = []
+    if config_path:
+        candidates = [config_path]
+    else:
+        candidates = [
+            Path("redforge.yaml"),
+            Path("redforge.yml"),
+            Path.home() / ".redforge" / "config.yaml",
+        ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            try:
+                from redforge.config.runner import _read_raw
+                raw = _read_raw(candidate)
+                console.print(f"[dim]Using config: {candidate}[/dim]")
+                return raw
+            except Exception as exc:  # noqa: BLE001
+                console.print(f"[yellow]Warning: could not load config {candidate}: {exc}[/yellow]")
+
+    return None
+
+
 @app.command()
 def scan(
-    provider: str = typer.Option(..., "--provider", "-p", help=_provider_help()),
+    provider: str | None = typer.Option(None, "--provider", "-p", help=_provider_help()),
     model: str | None = typer.Option(None, "--model", "-m", help="Model name/ID"),
-    authorization: str = typer.Option(..., "--authorization", "-a",
-                                      help=f"Authorization: {' | '.join(AUTHORIZATION_CHOICES)}"),
+    authorization: str | None = typer.Option(None, "--authorization", "-a",
+                                              help=f"Authorization: {' | '.join(AUTHORIZATION_CHOICES)}"),
     probes: str | None = typer.Option(None, "--probes",
                                       help="Comma-separated probe IDs. Default: all probes"),
     system_prompt: str | None = typer.Option(None, "--system-prompt",
                                              help="System prompt for the target model"),
-    format: str = typer.Option("markdown", "--format", "-f", help=_format_help()),
+    fmt: str | None = typer.Option(None, "--format", "-f", help=_format_help()),
     output: Path | None = typer.Option(None, "--output", "-o", help="Save report to file"),
     dry_run: bool = typer.Option(False, "--dry-run", help="List probes without executing"),
     no_store: bool = typer.Option(False, "--no-store",
                                   help="Do not persist scan results to disk"),
-    concurrency: int = typer.Option(3, "--concurrency",
-                                    help="Number of concurrent probe executions"),
+    concurrency: int | None = typer.Option(None, "--concurrency",
+                                           help="Number of concurrent probe executions"),
+    config: Path | None = typer.Option(None, "--config", "-c",
+                                       help="Path to redforge.yaml config file. "
+                                            "Auto-discovered if not specified."),
 ) -> None:
-    """Run a vulnerability scan against a target LLM."""
+    """Run a vulnerability scan against a target LLM.
+
+    CLI flags take priority over redforge.yaml values.
+    redforge.yaml is auto-discovered in the current directory if not specified.
+    """
     console.print(BANNER)
+
+    # ── Load config file (auto-discovered or explicit) ────────────────────────
+    raw_config = _load_project_config(config)
+
+    # ── Merge: CLI flags override config file ─────────────────────────────────
+    if raw_config:
+        provider = provider or raw_config.get("provider")
+        model = model or raw_config.get("model")
+        authorization = authorization or raw_config.get("authorization")
+        if not probes and raw_config.get("probes"):
+            raw_probe_list = raw_config["probes"]
+            if isinstance(raw_probe_list, list):
+                probes = ",".join(str(p) for p in raw_probe_list)
+        system_prompt = system_prompt or raw_config.get("system_prompt")
+        if not fmt:
+            cfg_output = raw_config.get("output")
+            cfg_fmt = raw_config.get("format")
+            if cfg_fmt:
+                fmt = str(cfg_fmt)
+            elif isinstance(cfg_output, dict) and cfg_output.get("format"):
+                fmt = str(cfg_output["format"])
+        if concurrency is None:
+            concurrency = raw_config.get("concurrency")
+
+    # ── Apply defaults ────────────────────────────────────────────────────────
+    fmt = fmt or "markdown"
+    concurrency = concurrency or 3
+
+    # ── Validate required fields ──────────────────────────────────────────────
+    if not provider:
+        console.print("[red]Error: --provider is required (or set 'provider' in redforge.yaml)[/red]")
+        raise typer.Exit(1)
+
+    if not authorization:
+        console.print("[red]Error: --authorization is required (or set 'authorization' in redforge.yaml)[/red]")
+        raise typer.Exit(1)
 
     if authorization not in AUTHORIZATION_CHOICES:
         console.print(
@@ -138,7 +215,7 @@ def scan(
     console.print(f"Risk Level: [{risk_color}]{s.risk_level}[/{risk_color}] ({s.risk_score:.1f}/10)")
     console.print(f"Probes: {s.passed}/{s.total_probes} passed ({s.pass_rate*100:.0f}%)")
 
-    reporter = get_reporter(format)
+    reporter = get_reporter(fmt)
     rendered = reporter.render(report)
 
     if output:
