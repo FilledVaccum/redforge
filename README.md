@@ -18,7 +18,7 @@
 
 <br/>
 
-RedForge is a comprehensive LLM security testing platform — **49+ probes** (Python + YAML, community-extensible), **10 provider adapters** including **any model on HuggingFace Hub**, **72-model catalog**, **named connection profiles**, **multi-turn attack orchestration**, **17-strategy mutation engine**, **composable scorers**, **YAML declarative probes**, **plugin extension system**, **auto-generated audit + guardrail reports**, and **compliance reporting** for NIST AI RMF, EU AI Act, ISO/IEC 42001, and OWASP LLM Top 10.
+RedForge is a comprehensive LLM security testing platform — **49+ probes** (Python + YAML, community-extensible), **10 provider adapters** including **any model on HuggingFace Hub**, **72-model catalog**, **named connection profiles**, **multi-turn attack orchestration**, **37-strategy mutation engine**, **composable scorers**, **YAML declarative probes**, **plugin extension system**, **auto-generated audit + guardrail reports**, and **compliance reporting** for NIST AI RMF, EU AI Act, ISO/IEC 42001, and OWASP LLM Top 10.
 
 [**Docs**](https://redforge.vercel.app) · [**Quick Start**](#quick-start) · [**Probes**](#probes-49) · [**Providers**](#providers) · [**API Reference**](https://redforge.vercel.app/docs/api-reference.html)
 
@@ -33,7 +33,7 @@ RedForge is a comprehensive LLM security testing platform — **49+ probes** (Py
 | OWASP LLM Top 10 coverage | ✅ **Full (10/10)** | Partial | Partial | Partial | Partial |
 | Probe count | ✅ **49+** (grows via YAML) | ~100 (narrow) | ~20 | ~15 | ~10 |
 | Multi-turn attacks (PAIR/Crescendo) | ✅ | ❌ | ❌ | ✅ | ❌ |
-| 17-strategy mutation engine | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 37-strategy mutation engine | ✅ | ❌ | ❌ | ❌ | ❌ |
 | YARA-style pattern scanner | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Semantic similarity detector | ✅ | ❌ | ❌ | ❌ | ❌ |
 | YAML declarative probes (no Python needed) | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -67,8 +67,8 @@ Full OWASP LLM Top 10 coverage. 47 Python probes + 2 community YAML probes (and 
 - Many-shot jailbreaking
 - GCG adversarial suffixes
 
-**🔀 17-Strategy Mutation Engine**
-Obfuscate payloads via Base64, ROT13, leet speak, Unicode normalization, token boundary manipulation, zero-width chars, and more.
+**🔀 37-Strategy Mutation Engine**
+Obfuscate payloads across 4 tiers: encoding (Base64, ROT13, Atbash, Morse, double-encode), Unicode disruption (fullwidth, math-bold, combining diacritics, char-spacing, RTLO), cognitive reframing (sandwich, few-shot priming, chain-of-thought, continuation, task decompose, negative framing), and structural injection (JSON, XML/CDATA, LaTeX, markdown code-block). Default set expands 2 payloads to 37 variants (18.5×). Enable via `redforge.yaml`: `mutations: {enabled: true}`.
 
 **🛡️ Bidirectional Guardrails**
 `InputScanner → LLM → OutputScanner` pipeline with prompt injection detection, PII detection, toxicity filtering, and secrets scanning.

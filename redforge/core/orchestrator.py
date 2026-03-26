@@ -30,6 +30,9 @@ class ScanConfig:
         concurrency: int = 3,
         store_results: bool = True,
         dry_run: bool = False,
+        enable_mutations: bool = False,
+        mutation_strategies: list[str] | None = None,
+        max_payloads_per_probe: int | None = None,
     ) -> None:
         self.probes = probes  # None = all probes
         self.system_prompt = system_prompt
@@ -39,6 +42,9 @@ class ScanConfig:
         self.concurrency = concurrency
         self.store_results = store_results
         self.dry_run = dry_run
+        self.enable_mutations = enable_mutations
+        self.mutation_strategies = mutation_strategies  # None = engine default set
+        self.max_payloads_per_probe = max_payloads_per_probe
 
 
 class ScanReport:
@@ -124,6 +130,27 @@ class Orchestrator:
         """Run one probe: send each payload, collect responses, score each."""
         results: list[ProbeResult] = []
         payloads = probe.payloads()
+
+        if self.config.enable_mutations:
+            try:
+                from redforge.mutations.engine import MutationEngine, MutationStrategy
+                engine = MutationEngine()
+                strategies = None
+                if self.config.mutation_strategies:
+                    strategies = [
+                        MutationStrategy(s) for s in self.config.mutation_strategies
+                        if s in MutationStrategy._value2member_map_  # noqa: SLF001
+                    ]
+                payloads = engine.generate_variants(
+                    payloads,
+                    strategies,
+                    max_variants=self.config.max_payloads_per_probe,
+                )
+            except Exception as exc:
+                logger.warning("Mutation expansion failed for %s: %s", probe.id, exc)
+
+        if self.config.max_payloads_per_probe:
+            payloads = payloads[: self.config.max_payloads_per_probe]
 
         logger.debug("Running probe %s (%d payloads)", probe.id, len(payloads))
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RedForge — LLM Red Teaming & Vulnerability Scanner</title>
-  <meta name="description" content="Production-grade LLM red teaming. 47 attack probes, 9 providers, OWASP LLM Top 10, MITRE ATLAS, compliance mapping. The most comprehensive open-source LLM security scanner.">
+  <meta name="description" content="Production-grade LLM red teaming. 49+ attack probes, 10 providers, 37-strategy mutation engine, OWASP LLM Top 10, MITRE ATLAS, compliance mapping. The most comprehensive open-source LLM security scanner.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/main.css">
@@ -16,7 +16,7 @@
   <span class="c-sep">//</span>
   <span class="c-alert">Authorized Testing Only</span>
   <span class="c-sep">//</span>
-  <span>v0.4.0 · Apache 2.0</span>
+  <span>v0.5.0 · Apache 2.0</span>
   <span class="c-sep">//</span>
   <span>Document ID: RF-2025-001</span>
 </div>
@@ -95,7 +95,7 @@
         <span class="stat-label">OWASP<br>Categories</span>
       </div>
       <div class="stat-block">
-        <span class="stat-num" data-target="17">0</span>
+        <span class="stat-num" data-target="37">0</span>
         <span class="stat-label">Mutation<br>Strategies</span>
       </div>
     </aside>
@@ -131,9 +131,9 @@
     </div>
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-004</span>
-      <div class="feat-name">17-Strategy Mutations</div>
-      <p class="feat-body">Base64, ROT13, l33t speak, typos, Unicode tricks, nested context, academic framing, roleplay injection — FuzzyAI-inspired exhausitve payload obfuscation.</p>
-      <div class="feat-tags"><span class="ftag">FuzzyAI-inspired</span><span class="ftag">17 strategies</span></div>
+      <div class="feat-name">37-Strategy Mutation Engine</div>
+      <p class="feat-body">4 attack tiers: encoding (Base64/ROT13/Atbash/Morse/double-encode), Unicode disruption (fullwidth/math-bold/diacritics/RTLO/char-spacing), cognitive reframing (sandwich/few-shot/CoT/continuation/task-decompose/negative-framing), and structural injection (JSON/XML/LaTeX/markdown). Default set: 18.5× payload expansion. Wire via <code>mutations: {enabled: true}</code>.</p>
+      <div class="feat-tags"><span class="ftag">37 strategies</span><span class="ftag">18.5× expansion</span><span class="ftag">4 tiers</span></div>
     </div>
     <div class="feat-cell">
       <span class="feat-n">RF-CAP-005</span>
@@ -368,7 +368,7 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
         <div class="terminal-body">
           <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">redforge scan --provider openai --model gpt-4o --authorization owned</span></div>
           <div class="t-blank"></div>
-          <div class="t-line"><span class="t-out">  RedForge v0.4.0 · LLM Vulnerability Scanner</span></div>
+          <div class="t-line"><span class="t-out">  RedForge v0.5.0 · LLM Vulnerability Scanner</span></div>
           <div class="t-line"><span class="t-out">  Provider: openai/gpt-4o · 49 probes loaded (47 Python + 2 YAML)</span></div>
           <div class="t-blank"></div>
           <div class="t-line"><span class="t-dim">  ── LLM01: Prompt Injection ─────────────────</span></div>
@@ -443,7 +443,7 @@ report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
         </tr>
         <tr>
           <td class="td-label">Payload mutation engine</td>
-          <td class="td-self"><span class="c-yes">✓ 17 strategies</span></td>
+          <td class="td-self"><span class="c-yes">✓ 37 strategies (4 tiers)</span></td>
           <td><span class="c-no">✕</span></td>
           <td><span class="c-no">✕</span></td>
           <td><span class="c-par">~ 5</span></td>
