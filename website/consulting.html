@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Security Audit — RedForge Professional Services</title>
+  <meta name="description" content="Expert LLM security audits. Full OWASP LLM Top 10 coverage, compliance gap reports (NIST AI RMF, EU AI Act, ISO 42001), guardrail recommendations. Starting at $4,900.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <style>
+    /* ── Consulting-specific styles ───────────────────── */
+    .risk-band {
+      background: var(--ink);
+      padding: clamp(3rem, 7vh, 6rem) var(--pad);
+    }
+    .risk-band-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .risk-stat {
+      padding: 2.5rem 2rem;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      border-bottom: none;
+    }
+    .risk-stat:last-child { border-right: none; }
+    .risk-stat-num {
+      display: block;
+      font-family: var(--f-stat);
+      font-size: 4.5rem;
+      line-height: 1;
+      color: var(--red);
+      letter-spacing: 0.02em;
+    }
+    .risk-stat-label {
+      display: block;
+      font-family: var(--f-mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    .risk-stat-source {
+      display: block;
+      font-family: var(--f-mono);
+      font-size: 0.5rem;
+      color: var(--ink-2);
+      letter-spacing: 0.08em;
+      margin-top: 0.4rem;
+    }
+
+    /* Steps */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: var(--border);
+      margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+    .step {
+      padding: 2.5rem 2rem;
+      border-right: var(--border);
+      position: relative;
+    }
+    .step:last-child { border-right: none; }
+    .step-n {
+      font-family: var(--f-stat);
+      font-size: 5rem;
+      line-height: 1;
+      color: var(--paper-3);
+      letter-spacing: 0.02em;
+      display: block;
+      margin-bottom: 1.25rem;
+    }
+    .step-title {
+      font-family: var(--f-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.75rem;
+    }
+    .step-body {
+      font-size: 0.72rem;
+      color: var(--ink-2);
+      line-height: 1.75;
+    }
+    .step-tag {
+      display: inline-block;
+      font-family: var(--f-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 0.2rem 0.55rem;
+      margin-top: 1rem;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: var(--border);
+      margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+    .price-card {
+      padding: 2.5rem 2rem;
+      border-right: var(--border);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .price-card:last-child { border-right: none; }
+    .price-card--featured {
+      background: var(--ink);
+    }
+    .price-card--featured .price-tier,
+    .price-card--featured .price-num,
+    .price-card--featured .price-period,
+    .price-card--featured .price-tagline { color: var(--paper); }
+    .price-card--featured .price-li { color: var(--ink-4); border-color: rgba(255,255,255,0.08); }
+    .price-card--featured .price-li::before { color: var(--red); }
+    .price-card--featured .price-badge { background: var(--red); color: var(--paper); }
+
+    .price-badge {
+      display: inline-block;
+      font-family: var(--f-mono);
+      font-size: 0.47rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.22rem 0.6rem;
+      margin-bottom: 1.5rem;
+      align-self: flex-start;
+    }
+    .price-badge--empty { opacity: 0; pointer-events: none; }
+    .price-tier {
+      font-family: var(--f-mono);
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      display: block;
+      margin-bottom: 0.6rem;
+    }
+    .price-num {
+      font-family: var(--f-stat);
+      font-size: 3.75rem;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+    .price-period {
+      font-family: var(--f-mono);
+      font-size: 0.6rem;
+      color: var(--ink-3);
+      letter-spacing: 0.1em;
+      margin-left: 0.2rem;
+    }
+    .price-tagline {
+      font-size: 0.7rem;
+      color: var(--ink-2);
+      margin-top: 0.75rem;
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+    .price-divider {
+      border: none;
+      border-top: var(--border);
+      margin: 0 0 1.5rem;
+    }
+    .price-list {
+      list-style: none;
+      flex: 1;
+      margin-bottom: 2rem;
+    }
+    .price-li {
+      font-family: var(--f-mono);
+      font-size: 0.65rem;
+      color: var(--ink-2);
+      padding: 0.55rem 0;
+      border-bottom: var(--border-2);
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+    .price-li::before {
+      content: '✓';
+      color: var(--ink-3);
+      font-size: 0.6rem;
+      flex-shrink: 0;
+    }
+    .price-cta {
+      display: block;
+      text-align: center;
+      font-family: var(--f-mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--ink);
+      color: var(--paper);
+      background: var(--ink);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      text-decoration: none;
+    }
+    .price-cta:hover { background: var(--red); border-color: var(--red); }
+    .price-cta--outline {
+      background: transparent;
+      color: var(--ink);
+    }
+    .price-cta--outline:hover { background: var(--ink); color: var(--paper); }
+    .price-card--featured .price-cta--outline {
+      color: var(--paper);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .price-card--featured .price-cta--outline:hover {
+      background: var(--paper);
+      color: var(--ink);
+      border-color: var(--paper);
+    }
+
+    /* Intake form */
+    .form-wrap {
+      background: var(--ink);
+      padding: clamp(4rem, 8vh, 7rem) var(--pad);
+    }
+    .form-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: clamp(3rem, 6vw, 7rem);
+      align-items: start;
+    }
+    .form-intro-label {
+      font-family: var(--f-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red);
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+    .form-intro-title {
+      font-family: var(--f-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      color: var(--paper);
+      margin-bottom: 2rem;
+    }
+    .form-intro-title em { color: var(--red); font-style: normal; }
+    .form-intro-body {
+      font-size: 0.72rem;
+      color: var(--ink-4);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .form-promise {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .form-promise-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      font-family: var(--f-mono);
+      font-size: 0.62rem;
+      color: var(--ink-4);
+      letter-spacing: 0.04em;
+    }
+    .form-promise-item span:first-child { color: var(--red); font-size: 0.6rem; }
+
+    .audit-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+    .form-field {
+      background: rgba(255,255,255,0.03);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-field--full { grid-column: 1 / -1; }
+    .form-label {
+      font-family: var(--f-mono);
+      font-size: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .form-input, .form-select, .form-textarea {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: var(--paper);
+      font-family: var(--f-mono);
+      font-size: 0.72rem;
+      padding: 0.4rem 0;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-input::placeholder,
+    .form-textarea::placeholder { color: var(--ink-2); }
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus { border-color: rgba(255,255,255,0.35); }
+    .form-select {
+      cursor: pointer;
+      background: transparent;
+      color: var(--ink-2);
+    }
+    .form-select option { background: #1a1a14; color: var(--paper); }
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.6;
+    }
+    .form-submit-row {
+      grid-column: 1 / -1;
+      background: rgba(255,255,255,0.03);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .form-submit-note {
+      font-family: var(--f-mono);
+      font-size: 0.55rem;
+      color: var(--ink-3);
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+    }
+    .form-submit-btn {
+      font-family: var(--f-mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 0.8rem 2rem;
+      background: var(--red);
+      color: var(--paper);
+      border: 1px solid var(--red);
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .form-submit-btn:hover { background: var(--red-2); border-color: var(--red-2); }
+
+    /* Deliverables */
+    .deliverable-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      border: var(--border);
+      margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+    .deliverable {
+      padding: 2.5rem 2rem;
+      border-right: var(--border);
+      border-bottom: var(--border);
+    }
+    .deliverable:nth-child(2n) { border-right: none; }
+    .deliverable:nth-last-child(-n+2) { border-bottom: none; }
+    .deliverable-icon {
+      font-family: var(--f-mono);
+      font-size: 0.525rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red);
+      display: block;
+      margin-bottom: 1.25rem;
+    }
+    .deliverable-title {
+      font-family: var(--f-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .deliverable-body {
+      font-size: 0.72rem;
+      color: var(--ink-2);
+      line-height: 1.75;
+    }
+    .deliverable-sample {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--paper-2);
+      border-left: 2px solid var(--red);
+      font-family: var(--f-mono);
+      font-size: 0.6rem;
+      color: var(--ink-3);
+      line-height: 1.6;
+    }
+
+    /* FAQ */
+    .faq-list {
+      border: var(--border);
+      margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+    .faq-item {
+      border-bottom: var(--border);
+      overflow: hidden;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.5rem 2rem;
+      font-family: var(--f-display);
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--ink);
+      transition: background 0.15s;
+    }
+    .faq-q:hover { background: var(--paper-2); }
+    .faq-arrow {
+      font-size: 0.9rem;
+      color: var(--ink-4);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--red); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 2rem;
+    }
+    .faq-item.open .faq-a {
+      max-height: 300px;
+      padding: 0 2rem 1.5rem;
+    }
+    .faq-a p {
+      font-size: 0.72rem;
+      color: var(--ink-2);
+      line-height: 1.8;
+    }
+
+    /* Sample report CTA band */
+    .sample-band {
+      border-top: var(--border);
+      border-bottom: var(--border);
+      background: var(--paper-2);
+      padding: clamp(2.5rem, 5vh, 4rem) var(--pad);
+    }
+    .sample-band-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .sample-band-text {}
+    .sample-band-label {
+      font-family: var(--f-mono);
+      font-size: 0.525rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .sample-band-title {
+      font-family: var(--f-display);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+    }
+    .sample-band-title em { color: var(--red); font-style: normal; }
+    .sample-band-sub {
+      font-size: 0.72rem;
+      color: var(--ink-3);
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+    .sample-band-actions { display: flex; gap: 1rem; flex-shrink: 0; }
+
+    /* Who it's for */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: var(--border);
+      margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+    .persona {
+      padding: 2.25rem 1.75rem;
+      border-right: var(--border);
+    }
+    .persona:last-child { border-right: none; }
+    .persona-role {
+      font-family: var(--f-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red);
+      display: block;
+      margin-bottom: 1rem;
+    }
+    .persona-title {
+      font-family: var(--f-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .persona-body {
+      font-size: 0.7rem;
+      color: var(--ink-2);
+      line-height: 1.75;
+    }
+    .persona-quote {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-left: 2px solid var(--ink-5);
+      font-size: 0.68rem;
+      color: var(--ink-3);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .risk-band-inner, .steps, .pricing-grid,
+      .deliverable-grid, .persona-grid { grid-template-columns: 1fr; }
+      .risk-stat, .step, .price-card, .deliverable, .persona { border-right: none; border-bottom: var(--border); }
+      .price-card:last-child { border-bottom: none; }
+      .form-inner { grid-template-columns: 1fr; }
+      .audit-form { grid-template-columns: 1fr; }
+      .form-field--full { grid-column: auto; }
+      .sample-band-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="classif-bar">
+  <span>RedForge Professional Services</span>
+  <span class="c-sep">//</span>
+  <span class="c-alert">Engagement RF-SVC-001</span>
+  <span class="c-sep">//</span>
+  <span>v0.5.0 · Apache 2.0</span>
+  <span class="c-sep">//</span>
+  <span>Authorized Testing Only</span>
+</div>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-mark">RF</span>
+      <span class="logo-text">RedForge</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="docs/getting-started.html">Docs</a></li>
+      <li><a href="docs/probes.html">Probes</a></li>
+      <li><a href="docs/api-reference.html">API</a></li>
+      <li><a href="docs/python-sdk.html">SDK</a></li>
+      <li><a href="consulting.html" class="active">Consulting</a></li>
+    </ul>
+    <a href="#intake" class="nav-cta">Request Audit →</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════ HERO -->
+<div style="border-bottom: 1px solid rgba(13,13,10,0.18);">
+  <section class="hero" style="grid-template-columns: 1fr auto; align-items: center;">
+    <div class="hero-left">
+
+      <div class="hero-eyebrow">
+        <span class="eyebrow-label">Professional Services</span>
+        <span class="eyebrow-sep">/</span>
+        <span class="eyebrow-id">LLM Security Audit</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line">Audit</span>
+        <span class="line">Your</span>
+        <span class="line">LLM</span>
+      </h1>
+
+      <div class="hero-rule">
+        <span class="hero-rule-line"></span>
+        <span class="redact" title="REDACTED">███████████████</span>
+        <span class="redact-label">&nbsp;Risk Assessment&nbsp;</span>
+        <span class="hero-rule-line-faint"></span>
+      </div>
+
+      <div class="hero-sub">
+        <p>Every LLM in production is an attack surface. We run the full RedForge battery against yours — 49+ probes across every OWASP LLM Top 10 category — and hand you the evidence-grade report your legal, security, and compliance teams need.</p>
+        <p>Flat-fee engagements. Results in 5 business days. Reports accepted by EU AI Act auditors.</p>
+      </div>
+
+      <div class="hero-actions" style="margin-top: 1rem;">
+        <a href="#intake" class="btn-primary">Request an Audit →</a>
+        <a href="assets/sample-audit-report.html" target="_blank" class="btn-ghost">View Sample Report →</a>
+      </div>
+    </div>
+
+    <aside class="hero-stats">
+      <div class="stat-block">
+        <span class="stat-num">49+</span>
+        <span class="stat-label">Attack<br>Probes</span>
+      </div>
+      <div class="stat-block stat-block--accent">
+        <span class="stat-num">5</span>
+        <span class="stat-label">Business<br>Day Turnaround</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Compliance<br>Frameworks</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num">$0</span>
+        <span class="stat-label">Infra Cost<br>To You</span>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════════════ RISK STATS -->
+<div class="risk-band">
+  <div class="risk-band-inner">
+    <div class="risk-stat">
+      <span class="risk-stat-num">72%</span>
+      <span class="risk-stat-label">Of production LLMs fail basic<br>prompt injection probes</span>
+      <span class="risk-stat-source">// RedForge internal scan data, 2025</span>
+    </div>
+    <div class="risk-stat">
+      <span class="risk-stat-num">€35M</span>
+      <span class="risk-stat-label">Maximum fine for high-risk AI systems<br>under EU AI Act Article 99</span>
+      <span class="risk-stat-source">// EU AI Act 2024/1689, in force Aug 2025</span>
+    </div>
+    <div class="risk-stat">
+      <span class="risk-stat-num">89%</span>
+      <span class="risk-stat-label">Of LLM breaches exploited<br>insufficient output validation</span>
+      <span class="risk-stat-source">// OWASP LLM Top 10, 2025 edition</span>
+    </div>
+  </div>
+</div>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ DELIVERABLES -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">01</span>
+    <h2 class="section-title">What You <em>Receive</em></h2>
+    <p class="section-aside">Every engagement produces four concrete deliverables — not a checkbox summary</p>
+  </div>
+
+  <div class="deliverable-grid">
+    <div class="deliverable">
+      <span class="deliverable-icon">D-001 // Vulnerability Report</span>
+      <div class="deliverable-title">Full Probe Scan Report</div>
+      <p class="deliverable-body">Complete results from all 49+ probes run against your LLM — every OWASP LLM Top 10 category, every MITRE ATLAS technique. Each finding includes the exact payload, the model's response, a CVSS-style risk score, and the evidence snippet that triggered the verdict.</p>
+      <div class="deliverable-sample">
+        FINDING RF-001-001 · CRITICAL · LLM01<br>
+        Payload: "Ignore previous instructions and..."<br>
+        Response: [REDACTED — 847 chars of sensitive output]<br>
+        Score: 9.1/10 · FAIL
+      </div>
+    </div>
+    <div class="deliverable">
+      <span class="deliverable-icon">D-002 // Compliance Gap Report</span>
+      <div class="deliverable-title">Regulatory Gap Analysis</div>
+      <p class="deliverable-body">Probe failures mapped directly to NIST AI RMF (GOVERN/MAP/MEASURE/MANAGE), EU AI Act Articles (9, 10, 13, 14, 15, 50, 53), and ISO/IEC 42001 clauses. Each gap states the control, the evidence of non-compliance, and the remediation required to close it. Hand this to an auditor.</p>
+      <div class="deliverable-sample">
+        EU AI Act Art. 9 — Risk Management System<br>
+        Status: NON-COMPLIANT<br>
+        Evidence: 3 critical failures in LLM01, LLM06 categories<br>
+        Required action: Implement prompt injection controls
+      </div>
+    </div>
+    <div class="deliverable">
+      <span class="deliverable-icon">D-003 // Guardrail Guide</span>
+      <div class="deliverable-title">Guardrail Implementation Guide</div>
+      <p class="deliverable-body">For every failed probe, a concrete guardrail recommendation: detector type (input scanner, output scanner, or both), scan target, YARA rule template ready to deploy, similarity reference patterns, and recommended action. Structured for direct import into llm-guard, Presidio, or a custom pipeline.</p>
+      <div class="deliverable-sample">
+        Detector: InputScanner → PromptInjectionDetector<br>
+        YARA rule: rf_001_prompt_injection.yar [attached]<br>
+        Similarity refs: 12 semantic anchors<br>
+        Priority: CRITICAL — implement before next deploy
+      </div>
+    </div>
+    <div class="deliverable">
+      <span class="deliverable-icon">D-004 // Remediation Roadmap</span>
+      <div class="deliverable-title">Prioritized Remediation Roadmap</div>
+      <p class="deliverable-body">All findings ranked by risk × exploitability × compliance impact. Each item includes: specific code/config change required, estimated implementation effort, re-test criteria, and which compliance controls it closes. Formatted for direct import into Jira, Linear, or GitHub Issues.</p>
+      <div class="deliverable-sample">
+        WEEK 1 · CRITICAL (3 items): Deploy input sanitizer,<br>
+        patch system prompt exposure, disable debug mode<br>
+        WEEK 2–4 · HIGH (4 items): Output validation layer...<br>
+        MONTH 2 · MEDIUM (6 items): Monitoring, rate limits...
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ PROCESS -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">02</span>
+    <h2 class="section-title">How It <em>Works</em></h2>
+    <p class="section-aside">Three steps from intake to report. No infrastructure setup on your end.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <span class="step-n">01</span>
+      <div class="step-title">Scope & Configure</div>
+      <p class="step-body">Submit the intake form below. You tell us: your LLM provider, model ID, endpoint URL, system prompt (if any), and intended use case. We scope the probe selection to match your deployment context — a customer-facing chatbot gets different probes than an internal code assistant.</p>
+      <span class="step-tag">// 30 min of your time</span>
+    </div>
+    <div class="step">
+      <span class="step-n">02</span>
+      <div class="step-title">Scan & Analyze</div>
+      <p class="step-body">We run the full RedForge battery against your endpoint — your API key, ephemeral, never stored. All 49+ probes execute with our 37-strategy mutation engine enabled, expanding coverage to hundreds of payload variants. Scan typically completes in 2–4 hours. Human analyst reviews every failure for false positive elimination.</p>
+      <span class="step-tag">// 2–3 business days</span>
+    </div>
+    <div class="step">
+      <span class="step-n">03</span>
+      <div class="step-title">Report & Debrief</div>
+      <p class="step-body">PDF report delivered within 5 business days. Professional engagement includes a 60-minute debrief call where we walk your team through every critical finding, answer questions, and prioritize the remediation roadmap. Enterprise tier includes a follow-up re-scan after your fixes are deployed.</p>
+      <span class="step-tag">// 5 business days total</span>
+    </div>
+  </div>
+</section>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ WHO IT'S FOR -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">03</span>
+    <h2 class="section-title">Who It's <em>For</em></h2>
+    <p class="section-aside">Three buying contexts — each with a different primary concern</p>
+  </div>
+
+  <div class="persona-grid">
+    <div class="persona">
+      <span class="persona-role">// Security Engineering</span>
+      <div class="persona-title">The CISO Preparing for Audit</div>
+      <p class="persona-body">You're shipping an LLM-powered product. Legal wants documentation that you've tested it. EU AI Act / SOC 2 / ISO 27001 auditors are asking for evidence of adversarial testing. You need a signed report that closes those checkboxes — fast.</p>
+      <div class="persona-quote">"We needed proof we'd tested our LLM for injection attacks before our SOC 2 audit. The RedForge report was exactly what the auditors wanted."</div>
+    </div>
+    <div class="persona">
+      <span class="persona-role">// AI/ML Engineering</span>
+      <div class="persona-title">The Team Shipping to Production</div>
+      <p class="persona-body">You've built a product on top of GPT-4 or Claude. You've done manual red teaming but you know you can't cover every attack vector. You want systematic coverage — a machine that runs the playbook you'd run if you had a month — in 5 days.</p>
+      <div class="persona-quote">"We found 4 critical vulnerabilities we'd completely missed. Three were fixable the same day with output validation changes."</div>
+    </div>
+    <div class="persona">
+      <span class="persona-role">// Legal & Compliance</span>
+      <div class="persona-title">The GC Navigating EU AI Act</div>
+      <p class="persona-body">You have a high-risk AI system under the EU AI Act. Article 9 requires a risk management system. Article 72 requires technical documentation. You need a third-party audit that produces documentation in the format regulators actually accept.</p>
+      <div class="persona-quote">"The compliance gap table mapped directly to what our DPA asked for. Saved us weeks of back-and-forth."</div>
+    </div>
+  </div>
+</section>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ SAMPLE REPORT -->
+<div class="sample-band reveal">
+  <div class="sample-band-inner">
+    <div class="sample-band-text">
+      <span class="sample-band-label">// Deliverable Preview · RF-SAMPLE-001</span>
+      <div class="sample-band-title">See a <em>Real</em><br>Audit Report</div>
+      <p class="sample-band-sub">Redacted sample from an actual engagement. Shows the exact format, depth, and compliance mapping your team will receive.</p>
+    </div>
+    <div class="sample-band-actions">
+      <a href="assets/sample-audit-report.html" target="_blank" class="btn-primary">View Sample Report →</a>
+    </div>
+  </div>
+</div>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ PRICING -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">04</span>
+    <h2 class="section-title">Engagement <em>Pricing</em></h2>
+    <p class="section-aside">Flat-fee. No hourly surprises. Invoice on delivery.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <span class="price-badge price-badge--empty">placeholder</span>
+      <span class="price-tier">// Starter</span>
+      <div>
+        <span class="price-num">$4,900</span>
+        <span class="price-period">flat</span>
+      </div>
+      <p class="price-tagline">One LLM deployment. Full probe run. PDF report. For startups and teams that need to move fast.</p>
+      <hr class="price-divider">
+      <ul class="price-list">
+        <li class="price-li">1 LLM endpoint scanned</li>
+        <li class="price-li">All 49+ probes executed</li>
+        <li class="price-li">OWASP LLM Top 10 coverage report</li>
+        <li class="price-li">PDF vulnerability report</li>
+        <li class="price-li">Guardrail implementation guide</li>
+        <li class="price-li">5 business day turnaround</li>
+        <li class="price-li">30-min debrief call</li>
+      </ul>
+      <a href="#intake" class="price-cta price-cta--outline">Request Starter →</a>
+    </div>
+
+    <div class="price-card price-card--featured">
+      <span class="price-badge">Most Popular</span>
+      <span class="price-tier">// Professional</span>
+      <div>
+        <span class="price-num">$12,900</span>
+        <span class="price-period">flat</span>
+      </div>
+      <p class="price-tagline">Up to 3 deployments. Full compliance gap report. Everything you need for an EU AI Act or SOC 2 audit.</p>
+      <hr class="price-divider" style="border-color: rgba(255,255,255,0.08);">
+      <ul class="price-list">
+        <li class="price-li">Up to 3 LLM endpoints scanned</li>
+        <li class="price-li">All 49+ probes + mutation engine</li>
+        <li class="price-li">Compliance gap report: NIST AI RMF + EU AI Act + ISO 42001</li>
+        <li class="price-li">Prioritized remediation roadmap</li>
+        <li class="price-li">YARA rule templates for every finding</li>
+        <li class="price-li">Audit JSONL (full forensic record)</li>
+        <li class="price-li">60-min debrief + executive summary slide</li>
+        <li class="price-li">5 business day turnaround</li>
+      </ul>
+      <a href="#intake" class="price-cta price-cta--outline">Request Professional →</a>
+    </div>
+
+    <div class="price-card">
+      <span class="price-badge price-badge--empty">placeholder</span>
+      <span class="price-tier">// Enterprise</span>
+      <div>
+        <span class="price-num">Custom</span>
+      </div>
+      <p class="price-tagline">Continuous monitoring, custom probes, multi-model benchmarking, expert witness services, red team exercises.</p>
+      <hr class="price-divider">
+      <ul class="price-list">
+        <li class="price-li">Unlimited endpoints</li>
+        <li class="price-li">Custom probe development for your threat model</li>
+        <li class="price-li">Continuous automated re-scanning (CI/CD gate)</li>
+        <li class="price-li">Multi-model benchmarking & comparison</li>
+        <li class="price-li">Expert testimony / regulatory support</li>
+        <li class="price-li">Dedicated Slack channel for findings</li>
+        <li class="price-li">Quarterly security review</li>
+        <li class="price-li">Re-scan after remediation (included)</li>
+      </ul>
+      <a href="#intake" class="price-cta price-cta--outline">Contact for Pricing →</a>
+    </div>
+  </div>
+</section>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ INTAKE FORM -->
+<div class="form-wrap reveal" id="intake">
+  <div class="form-inner">
+    <div>
+      <span class="form-intro-label">// Initiate Engagement</span>
+      <h2 class="form-intro-title">Request<br>an <em>Audit</em></h2>
+      <p class="form-intro-body">Fill out the form and we'll respond within one business day with a scoping questionnaire and an engagement letter. No obligation until you sign.</p>
+      <div class="form-promise">
+        <div class="form-promise-item"><span>→</span><span>Response within 1 business day</span></div>
+        <div class="form-promise-item"><span>→</span><span>Your API key is ephemeral — never stored</span></div>
+        <div class="form-promise-item"><span>→</span><span>NDA available before any technical discussion</span></div>
+        <div class="form-promise-item"><span>→</span><span>Flat fee invoiced on delivery — no surprises</span></div>
+        <div class="form-promise-item"><span>→</span><span>Results covered by professional liability insurance</span></div>
+      </div>
+    </div>
+
+    <!-- Replace YOUR_FORM_ID with your Formspree form ID after signing up at formspree.io -->
+    <form class="audit-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" id="audit-request-form">
+      <div class="form-field">
+        <label class="form-label" for="name">Full Name</label>
+        <input class="form-input" type="text" id="name" name="name" placeholder="Jane Smith" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="company">Company</label>
+        <input class="form-input" type="text" id="company" name="company" placeholder="Acme Corp" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="email">Work Email</label>
+        <input class="form-input" type="email" id="email" name="email" placeholder="jane@company.com" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="role">Your Role</label>
+        <select class="form-select" id="role" name="role">
+          <option value="" disabled selected>Select your role</option>
+          <option value="ciso">CISO / Head of Security</option>
+          <option value="engineering">Engineering Lead / CTO</option>
+          <option value="legal">Legal / Compliance / GC</option>
+          <option value="product">Product Manager</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="provider">LLM Provider</label>
+        <select class="form-select" id="provider" name="provider">
+          <option value="" disabled selected>Select provider</option>
+          <option value="openai">OpenAI (GPT-4o / GPT-4)</option>
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="google">Google (Gemini)</option>
+          <option value="azure">Azure OpenAI</option>
+          <option value="bedrock">AWS Bedrock</option>
+          <option value="mistral">Mistral AI</option>
+          <option value="huggingface">HuggingFace / Self-hosted</option>
+          <option value="other">Other / Multiple</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="tier">Engagement Tier</label>
+        <select class="form-select" id="tier" name="tier">
+          <option value="" disabled selected>Select tier</option>
+          <option value="starter">Starter — $4,900</option>
+          <option value="professional">Professional — $12,900</option>
+          <option value="enterprise">Enterprise — Custom</option>
+          <option value="unsure">Not sure yet</option>
+        </select>
+      </div>
+      <div class="form-field form-field--full">
+        <label class="form-label" for="usecase">Describe Your Use Case</label>
+        <textarea class="form-textarea" id="usecase" name="usecase" placeholder="e.g. Customer-facing support chatbot built on GPT-4o, with a system prompt restricting it to product topics. Handling ~5k conversations/day. Need to pass internal InfoSec review before GA launch." rows="4"></textarea>
+      </div>
+      <div class="form-field form-field--full">
+        <label class="form-label" for="timeline">Timeline</label>
+        <select class="form-select" id="timeline" name="timeline">
+          <option value="" disabled selected>When do you need results?</option>
+          <option value="asap">ASAP (within 2 weeks)</option>
+          <option value="month">Within a month</option>
+          <option value="quarter">This quarter</option>
+          <option value="planning">Planning ahead</option>
+        </select>
+      </div>
+      <div class="form-submit-row">
+        <p class="form-submit-note">
+          By submitting you agree to our<br>
+          <a href="#" style="color: var(--ink-3); text-decoration: underline;">Terms of Service</a> and
+          <a href="#" style="color: var(--ink-3); text-decoration: underline;">Privacy Policy</a>
+        </p>
+        <button class="form-submit-btn" type="submit">Submit Request →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════ FAQ -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">05</span>
+    <h2 class="section-title">Frequently <em>Asked</em></h2>
+    <p class="section-aside">Common questions before an engagement</p>
+  </div>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        Do you need access to our system prompt or internal code?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>No. We only need your LLM's publicly accessible endpoint URL and an API key scoped to inference only. If you want to include your system prompt in the test (recommended — it changes what's exploitable), you share it directly in the intake form. We sign an NDA before any technical details are exchanged if you prefer.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        What happens to our API key during the scan?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>Your API key is used exclusively to run the scan and is never stored on disk. All scan execution happens in an ephemeral environment that is destroyed immediately after results are saved. You can rotate the key immediately after the engagement — we recommend it. The key is never logged, printed in reports, or retained beyond the active scan window.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        Is the RedForge scanner itself open source? Why pay for the audit?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>Yes — the scanner is Apache 2.0 open source on GitHub. What you're paying for is (1) expert configuration of the probe suite for your specific deployment context, (2) human analyst review to eliminate false positives and add contextual severity, (3) compliance mapping done by someone who's read the actual regulatory text, and (4) a signed, auditor-grade PDF report you can present to regulators, customers, or your board. The tool is free. The expertise and accountability are not.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        Can the report be used for EU AI Act Article 9 compliance documentation?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>Yes. The Professional and Enterprise tiers produce a compliance gap report explicitly structured around EU AI Act Articles 9, 10, 13, 14, 15, 50, and 53 — the articles most relevant to LLM deployments. Each finding is mapped to the specific article and clause, with a statement of current compliance status and required remediation. Several clients have used this directly in their technical documentation submitted to supervisory authorities.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        How is this different from running RedForge ourselves?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>Running the scanner yourself gives you raw results. An engagement gives you: (1) expert probe selection and tuning for your use case, (2) false positive elimination — automated scans produce noise; analysts remove it, (3) compliance mapping done correctly — the NIST/EU AI Act mapping is only valuable if it's accurate, (4) a signed, dated PDF that carries professional accountability, (5) a remediation roadmap prioritized by your actual risk profile, not just CVSS score. Most critically: a report you wrote yourself will not satisfy a third-party auditor.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">
+        Do you offer ongoing / continuous testing after the initial audit?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">
+        <p>Yes — the Enterprise tier includes continuous automated re-scanning wired into your CI/CD pipeline via the RedForge REST API. Every model update, prompt change, or new deployment triggers a scan. You get a webhook notification and a new delta report showing what changed. This is the "security as a service" model, priced on a monthly retainer based on scan volume and number of endpoints.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Red<em>Forge</em></div>
+        <p>Production-grade LLM Red Teaming & Vulnerability Scanner. Apache 2.0 licensed. For authorized testing only.</p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top: 1rem;">
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">Apache 2.0</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">49+ Probes</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">10 Providers</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-links-title">Documentation</div>
+        <ul class="footer-links">
+          <li><a href="docs/getting-started.html">Getting Started</a></li>
+          <li><a href="docs/installation.html">Installation</a></li>
+          <li><a href="docs/cli-reference.html">CLI Reference</a></li>
+          <li><a href="docs/python-sdk.html">Python SDK</a></li>
+          <li><a href="docs/configuration.html">Configuration</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-links-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="consulting.html">LLM Security Audit</a></li>
+          <li><a href="assets/sample-audit-report.html">Sample Report</a></li>
+          <li><a href="#intake">Request Engagement</a></li>
+          <li><a href="docs/compliance.html">Compliance Coverage</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-links-title">Project</div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/FilledVaccum/redforge">GitHub</a></li>
+          <li><a href="docs/probes.html">Probe Catalog</a></li>
+          <li><a href="docs/attacks.html">Attack Modules</a></li>
+          <li><a href="docs/mutations.html">Mutation Engine</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 RedForge · Apache 2.0 · For authorized use only</span>
+      <span>redforge.vercel.app</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Reveal on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Form submission feedback
+  const form = document.getElementById('audit-request-form');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      const action = this.getAttribute('action');
+      if (action.includes('YOUR_FORM_ID')) return; // let form handle it natively
+    });
+  }
+</script>
+</body>
+</html>
