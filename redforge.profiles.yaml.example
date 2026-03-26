@@ -1,0 +1,475 @@
+# redforge.profiles.yaml — Connection profiles for RedForge
+#
+# Copy to redforge.profiles.yaml (project-local) or ~/.redforge/profiles.yaml (user-global).
+# Profiles referenced by name in CLI and SDK:
+#
+#   redforge scan --profile my-gpt4o --authorization owned
+#   AdapterFactory.from_profile("my-gpt4o")
+#
+# NOTE: Built-in profiles for every catalog model already exist without
+# this file. Short names like "gpt-4o", "claude-3-5-sonnet-20241022",
+# "llama3:8b" work out of the box. Use this file to:
+#   - Override defaults (different API key env var, custom base_url, etc.)
+#   - Add profiles for models not in the built-in catalog
+#   - Create named environments (prod vs staging vs local)
+#
+# Field reference:
+#   provider:        openai | anthropic | gemini | bedrock | azure | mistral | ollama | rest
+#   model:           model ID exactly as used in the provider's API
+#   description:     shown in `redforge models list`
+#   tags:            arbitrary labels for filtering
+#   api_key_env:     env var name holding the API key (overrides provider default)
+#   base_url:        custom endpoint (vLLM, LM Studio, remote Ollama, Azure endpoint, etc.)
+#   region:          AWS region for Bedrock; Azure region for Azure OpenAI
+#   deployment_name: Azure OpenAI deployment name
+#   timeout:         request timeout in seconds (default: 30)
+#   max_retries:     retry attempts on transient errors (default: 3)
+#   temperature:     sampling temperature (default: 0.7)
+#   max_tokens:      max response tokens (default: 1024)
+#   extra_headers:   map of additional HTTP headers
+#   extra_params:    passed through to provider SDK as-is
+
+profiles:
+
+  # ════════════════════════════════════════════════════════════
+  # OpenAI
+  # Env var: OPENAI_API_KEY
+  # ════════════════════════════════════════════════════════════
+
+  gpt-4o:
+    description: "OpenAI GPT-4o (latest, multimodal)"
+    provider: openai
+    model: gpt-4o
+    tags: [openai, flagship, vision]
+
+  gpt-4o-mini:
+    description: "OpenAI GPT-4o Mini (fast, cheap)"
+    provider: openai
+    model: gpt-4o-mini
+    tags: [openai, fast, cheap]
+
+  gpt-4-turbo:
+    description: "OpenAI GPT-4 Turbo (128k context)"
+    provider: openai
+    model: gpt-4-turbo
+    tags: [openai, large-context]
+
+  gpt-3.5-turbo:
+    description: "OpenAI GPT-3.5 Turbo (fastest, cheapest)"
+    provider: openai
+    model: gpt-3.5-turbo
+    tags: [openai, fast, cheap]
+
+  o1:
+    description: "OpenAI o1 (reasoning model)"
+    provider: openai
+    model: o1
+    timeout: 120
+    tags: [openai, reasoning]
+
+  o1-mini:
+    description: "OpenAI o1-mini (fast reasoning)"
+    provider: openai
+    model: o1-mini
+    timeout: 60
+    tags: [openai, reasoning, fast]
+
+  o3-mini:
+    description: "OpenAI o3-mini (efficient reasoning)"
+    provider: openai
+    model: o3-mini
+    timeout: 60
+    tags: [openai, reasoning, fast]
+
+  # Example: separate prod/staging keys for the same model
+  openai-prod:
+    description: "OpenAI GPT-4o — production key"
+    provider: openai
+    model: gpt-4o
+    api_key_env: PROD_OPENAI_API_KEY
+    tags: [openai, production]
+
+  openai-staging:
+    description: "OpenAI GPT-4o — staging key"
+    provider: openai
+    model: gpt-4o
+    api_key_env: STAGING_OPENAI_API_KEY
+    tags: [openai, staging]
+
+  # Example: OpenAI-compatible endpoint (vLLM, LM Studio, Together, etc.)
+  vllm-local:
+    description: "Local vLLM serving llama3 on OpenAI-compatible API"
+    provider: openai
+    model: meta-llama/Meta-Llama-3-8B-Instruct
+    base_url: http://localhost:8000/v1
+    api_key_env: VLLM_API_KEY
+    tags: [local, openai-compat, free]
+
+  together-llama:
+    description: "Meta Llama 3.1 70B via Together AI"
+    provider: openai
+    model: meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
+    base_url: https://api.together.xyz/v1
+    api_key_env: TOGETHER_API_KEY
+    tags: [together, llama, openai-compat]
+
+  # ════════════════════════════════════════════════════════════
+  # Anthropic
+  # Env var: ANTHROPIC_API_KEY
+  # ════════════════════════════════════════════════════════════
+
+  claude-3-5-sonnet:
+    description: "Claude 3.5 Sonnet (flagship, best for red-teaming)"
+    provider: anthropic
+    model: claude-3-5-sonnet-20241022
+    tags: [anthropic, flagship]
+
+  claude-3-5-haiku:
+    description: "Claude 3.5 Haiku (fast, efficient)"
+    provider: anthropic
+    model: claude-3-5-haiku-20241022
+    tags: [anthropic, fast]
+
+  claude-3-opus:
+    description: "Claude 3 Opus (most capable Claude 3)"
+    provider: anthropic
+    model: claude-3-opus-20240229
+    tags: [anthropic, powerful]
+
+  claude-3-sonnet:
+    description: "Claude 3 Sonnet (balanced)"
+    provider: anthropic
+    model: claude-3-sonnet-20240229
+    tags: [anthropic, balanced]
+
+  claude-3-haiku:
+    description: "Claude 3 Haiku (fastest Claude)"
+    provider: anthropic
+    model: claude-3-haiku-20240307
+    tags: [anthropic, fast, cheap]
+
+  # ════════════════════════════════════════════════════════════
+  # Google Gemini
+  # Env var: GOOGLE_API_KEY
+  # ════════════════════════════════════════════════════════════
+
+  gemini-1.5-pro:
+    description: "Gemini 1.5 Pro (2M context, multimodal)"
+    provider: gemini
+    model: gemini-1.5-pro
+    tags: [google, large-context, vision]
+
+  gemini-1.5-flash:
+    description: "Gemini 1.5 Flash (fast, efficient)"
+    provider: gemini
+    model: gemini-1.5-flash
+    tags: [google, fast]
+
+  gemini-2.0-flash:
+    description: "Gemini 2.0 Flash (latest Gemini)"
+    provider: gemini
+    model: gemini-2.0-flash
+    tags: [google, fast, latest]
+
+  gemini-2.0-flash-lite:
+    description: "Gemini 2.0 Flash Lite (cheapest Gemini)"
+    provider: gemini
+    model: gemini-2.0-flash-lite
+    tags: [google, fast, cheap]
+
+  # ════════════════════════════════════════════════════════════
+  # Mistral AI
+  # Env var: MISTRAL_API_KEY
+  # ════════════════════════════════════════════════════════════
+
+  mistral-large:
+    description: "Mistral Large (flagship)"
+    provider: mistral
+    model: mistral-large-latest
+    tags: [mistral, flagship]
+
+  mistral-small:
+    description: "Mistral Small (fast, efficient)"
+    provider: mistral
+    model: mistral-small-latest
+    tags: [mistral, fast]
+
+  codestral:
+    description: "Codestral (code specialist)"
+    provider: mistral
+    model: codestral-latest
+    tags: [mistral, code]
+
+  mixtral-8x22b:
+    description: "Mixtral 8x22B (open-weights MoE)"
+    provider: mistral
+    model: open-mixtral-8x22b
+    tags: [mistral, open-weights, moe]
+
+  # ════════════════════════════════════════════════════════════
+  # AWS Bedrock
+  # Auth: AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY, or IAM role
+  # Each model family uses a different request format — handled automatically.
+  # ════════════════════════════════════════════════════════════
+
+  # ── Anthropic Claude on Bedrock ──────────────────────────────
+  bedrock-claude-3-5-sonnet:
+    description: "Claude 3.5 Sonnet via AWS Bedrock (us-east-1)"
+    provider: bedrock
+    model: anthropic.claude-3-5-sonnet-20241022-v2:0
+    region: us-east-1
+    tags: [bedrock, anthropic, aws]
+
+  bedrock-claude-3-5-sonnet-west:
+    description: "Claude 3.5 Sonnet via AWS Bedrock (us-west-2)"
+    provider: bedrock
+    model: anthropic.claude-3-5-sonnet-20241022-v2:0
+    region: us-west-2
+    tags: [bedrock, anthropic, aws]
+
+  bedrock-claude-3-opus:
+    description: "Claude 3 Opus via AWS Bedrock"
+    provider: bedrock
+    model: anthropic.claude-3-opus-20240229-v1:0
+    region: us-east-1
+    tags: [bedrock, anthropic, aws]
+
+  bedrock-claude-3-haiku:
+    description: "Claude 3 Haiku via AWS Bedrock (fastest/cheapest)"
+    provider: bedrock
+    model: anthropic.claude-3-haiku-20240307-v1:0
+    region: us-east-1
+    tags: [bedrock, anthropic, aws, fast]
+
+  # ── Meta Llama on Bedrock ─────────────────────────────────────
+  bedrock-llama3-405b:
+    description: "Meta Llama 3.1 405B via Bedrock (largest open model)"
+    provider: bedrock
+    model: meta.llama3-1-405b-instruct-v1:0
+    region: us-east-1
+    timeout: 120
+    tags: [bedrock, meta, llama, open-weights]
+
+  bedrock-llama3-70b:
+    description: "Meta Llama 3 70B via Bedrock"
+    provider: bedrock
+    model: meta.llama3-70b-instruct-v1:0
+    region: us-east-1
+    tags: [bedrock, meta, llama, open-weights]
+
+  bedrock-llama3-8b:
+    description: "Meta Llama 3 8B via Bedrock (fast)"
+    provider: bedrock
+    model: meta.llama3-8b-instruct-v1:0
+    region: us-east-1
+    tags: [bedrock, meta, llama, fast]
+
+  # ── Mistral on Bedrock ────────────────────────────────────────
+  bedrock-mistral-large:
+    description: "Mistral Large via AWS Bedrock"
+    provider: bedrock
+    model: mistral.mistral-large-2402-v1:0
+    region: us-east-1
+    tags: [bedrock, mistral, aws]
+
+  bedrock-mixtral-8x7b:
+    description: "Mixtral 8x7B Instruct via AWS Bedrock"
+    provider: bedrock
+    model: mistral.mixtral-8x7b-instruct-v0:1
+    region: us-east-1
+    tags: [bedrock, mistral, moe, aws]
+
+  # ── Amazon Titan on Bedrock ───────────────────────────────────
+  bedrock-titan-premier:
+    description: "Amazon Titan Text Premier (Amazon's flagship)"
+    provider: bedrock
+    model: amazon.titan-text-premier-v1:0
+    region: us-east-1
+    tags: [bedrock, amazon, titan]
+
+  bedrock-titan-express:
+    description: "Amazon Titan Text Express (fast, cheap)"
+    provider: bedrock
+    model: amazon.titan-text-express-v1
+    region: us-east-1
+    tags: [bedrock, amazon, titan, fast]
+
+  # ── Cohere on Bedrock ─────────────────────────────────────────
+  bedrock-command-r-plus:
+    description: "Cohere Command R+ via AWS Bedrock (RAG-optimized)"
+    provider: bedrock
+    model: cohere.command-r-plus-v1:0
+    region: us-east-1
+    tags: [bedrock, cohere, rag]
+
+  bedrock-command-r:
+    description: "Cohere Command R via AWS Bedrock"
+    provider: bedrock
+    model: cohere.command-r-v1:0
+    region: us-east-1
+    tags: [bedrock, cohere]
+
+  # ── AI21 on Bedrock ───────────────────────────────────────────
+  bedrock-jamba:
+    description: "AI21 Jamba 1.5 Large via AWS Bedrock (SSM architecture)"
+    provider: bedrock
+    model: ai21.jamba-1-5-large-v1:0
+    region: us-east-1
+    tags: [bedrock, ai21, ssm]
+
+  # ════════════════════════════════════════════════════════════
+  # Azure OpenAI
+  # Env vars: AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT
+  # ════════════════════════════════════════════════════════════
+
+  azure-gpt-4o:
+    description: "GPT-4o via Azure OpenAI"
+    provider: azure
+    model: gpt-4o
+    deployment_name: gpt-4o
+    region: eastus
+    tags: [azure, openai]
+
+  azure-gpt-4-turbo:
+    description: "GPT-4 Turbo via Azure OpenAI"
+    provider: azure
+    model: gpt-4-turbo
+    deployment_name: gpt-4-turbo
+    region: eastus
+    tags: [azure, openai]
+
+  # Example: separate prod/staging Azure deployments
+  azure-gpt4o-prod:
+    description: "GPT-4o Azure — production deployment"
+    provider: azure
+    model: gpt-4o
+    deployment_name: gpt4o-prod-deployment
+    region: eastus
+    api_key_env: AZURE_PROD_OPENAI_API_KEY
+    base_url: https://my-company.openai.azure.com
+    tags: [azure, production]
+
+  # ════════════════════════════════════════════════════════════
+  # Ollama (local, no API key required)
+  # Default base_url: http://localhost:11434
+  # ════════════════════════════════════════════════════════════
+
+  llama3.2:
+    description: "Meta Llama 3.2 (latest, local Ollama)"
+    provider: ollama
+    model: llama3.2
+    tags: [ollama, local, free, llama]
+
+  llama3.1:
+    description: "Meta Llama 3.1 8B (local Ollama)"
+    provider: ollama
+    model: llama3.1
+    tags: [ollama, local, free, llama]
+
+  llama3:
+    description: "Meta Llama 3 8B (local Ollama)"
+    provider: ollama
+    model: llama3
+    tags: [ollama, local, free, llama]
+
+  mistral-ollama:
+    description: "Mistral 7B (local Ollama)"
+    provider: ollama
+    model: mistral
+    tags: [ollama, local, free, mistral]
+
+  mixtral-ollama:
+    description: "Mixtral 8x7B (local Ollama — requires ~26GB VRAM)"
+    provider: ollama
+    model: mixtral
+    timeout: 120
+    tags: [ollama, local, free, moe]
+
+  codellama:
+    description: "Code Llama (local Ollama — code specialist)"
+    provider: ollama
+    model: codellama
+    tags: [ollama, local, free, code]
+
+  qwen2.5:
+    description: "Qwen 2.5 (local Ollama)"
+    provider: ollama
+    model: qwen2.5
+    tags: [ollama, local, free]
+
+  gemma2:
+    description: "Google Gemma 2 (local Ollama)"
+    provider: ollama
+    model: gemma2
+    tags: [ollama, local, free, google]
+
+  phi3.5:
+    description: "Microsoft Phi-3.5 Mini (local Ollama — very fast)"
+    provider: ollama
+    model: phi3.5
+    tags: [ollama, local, free, fast, small]
+
+  deepseek-r1:
+    description: "DeepSeek R1 reasoning model (local Ollama)"
+    provider: ollama
+    model: deepseek-r1
+    timeout: 120
+    tags: [ollama, local, free, reasoning]
+
+  llava:
+    description: "LLaVA multimodal (local Ollama — vision + language)"
+    provider: ollama
+    model: llava
+    tags: [ollama, local, free, vision]
+
+  # Example: remote Ollama instance
+  ollama-remote:
+    description: "Ollama on remote GPU server"
+    provider: ollama
+    model: llama3.1
+    base_url: http://192.168.1.100:11434
+    tags: [ollama, remote, free]
+
+  # ════════════════════════════════════════════════════════════
+  # Generic REST (any OpenAI-compatible endpoint)
+  # Env var: REDFORGE_REST_API_KEY (optional)
+  # ════════════════════════════════════════════════════════════
+
+  lm-studio:
+    description: "LM Studio local server (OpenAI-compatible)"
+    provider: rest
+    model: local-model
+    base_url: http://localhost:1234/v1
+    tags: [local, free, rest]
+
+  # ════════════════════════════════════════════════════════════
+  # Scan environment presets — combine model + scan settings
+  # ════════════════════════════════════════════════════════════
+
+  # Quick local scan — no API key, fast, free
+  quick-local:
+    description: "Fast local scan with Ollama phi3.5"
+    provider: ollama
+    model: phi3.5
+    max_tokens: 512
+    temperature: 0.5
+    tags: [preset, local, fast, free]
+
+  # Deep prod scan — best model, high token limit
+  deep-scan:
+    description: "Deep scan with GPT-4o, higher token budget"
+    provider: openai
+    model: gpt-4o
+    max_tokens: 2048
+    temperature: 0.7
+    tags: [preset, thorough]
+
+  # CI/CD scan — fast model, minimal tokens, strict timeout
+  ci:
+    description: "CI/CD pipeline scan — fast and cheap"
+    provider: openai
+    model: gpt-4o-mini
+    max_tokens: 512
+    timeout: 20
+    max_retries: 2
+    tags: [preset, ci, fast]

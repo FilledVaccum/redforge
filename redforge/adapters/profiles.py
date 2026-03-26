@@ -121,19 +121,59 @@ class ProfileManager:
     # Public API
     # ------------------------------------------------------------------
 
-    def load(self) -> dict[str, ConnectionProfile]:
-        """Load all profiles from the first matching YAML file.
+    @staticmethod
+    def _builtin_profiles() -> dict[str, ConnectionProfile]:
+        """Auto-generate one profile per model in MODEL_CATALOG.
 
-        Missing or unreadable files are silently skipped — the method
-        never raises.
+        This means every catalog model is addressable by profile name with
+        zero user configuration:
+            AdapterFactory.from_profile("gpt-4o")
+            AdapterFactory.from_profile("claude-3-5-sonnet-20241022")
+            AdapterFactory.from_profile("llama3:8b")
+
+        Aliases from the catalog are also registered, so short names work:
+            AdapterFactory.from_profile("claude-3.5-sonnet")  # alias
+
+        User YAML profiles with the same name override these built-ins.
+        """
+        from redforge.adapters.model_catalog import MODEL_CATALOG
+
+        profiles: dict[str, ConnectionProfile] = {}
+        for spec, spec_model in MODEL_CATALOG.items():
+            cfg = AdapterConfig(
+                provider=spec_model.provider,
+                model=spec_model.model_id,
+                region="us-east-1" if spec_model.provider == "bedrock" else None,
+            )
+            p = ConnectionProfile(
+                name=spec_model.model_id,
+                config=cfg,
+                description=spec_model.display_name,
+                tags=list(spec_model.tags) + ["builtin"],
+            )
+            profiles[spec_model.model_id] = p
+            # Also register under full spec string "provider/model_id"
+            profiles[spec] = p
+            # And register every alias
+            for alias in spec_model.aliases:
+                profiles[alias] = p
+        return profiles
+
+    def load(self) -> dict[str, ConnectionProfile]:
+        """Load profiles: built-ins first, then user YAML (user overrides built-ins).
+
+        Missing or unreadable files are silently skipped — the method never raises.
 
         Returns:
-            Mapping of profile name → ConnectionProfile.  Empty dict if
-            no files were found or all files were empty / unreadable.
+            Merged mapping of profile name → ConnectionProfile.
         """
         if self._cache is not None:
             return self._cache
 
+        # Start with built-in profiles (one per catalog model + aliases)
+        merged: dict[str, ConnectionProfile] = self._builtin_profiles()
+
+        # Layer user YAML profiles on top — user definitions win
         for path in self._candidate_paths():
             if not path.exists():
                 continue
@@ -141,20 +181,17 @@ class ProfileManager:
             profiles_raw = data.get("profiles", {})
             if not isinstance(profiles_raw, dict):
                 continue
-            profiles: dict[str, ConnectionProfile] = {}
             for pname, pdata in profiles_raw.items():
                 if not isinstance(pdata, dict):
                     continue
                 try:
-                    profiles[pname] = self._profile_from_dict(pname, dict(pdata))
+                    merged[pname] = self._profile_from_dict(pname, dict(pdata))
                 except Exception:  # noqa: BLE001, S112
-                    # Silently skip malformed entries
                     continue
-            self._cache = profiles
-            return profiles
+            break  # stop at first found YAML file
 
-        self._cache = {}
-        return {}
+        self._cache = merged
+        return merged
 
     def get(self, name: str) -> ConnectionProfile | None:
         """Retrieve a profile by name.
