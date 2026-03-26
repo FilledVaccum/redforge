@@ -172,13 +172,20 @@ class FailuresReporter(BaseReporter):
 # ── Entry builders ────────────────────────────────────────────────────────────
 
 def _build_failure_entry(result: ProbeResult) -> dict[str, Any]:
-    meta = _OWASP_GUARDRAIL_META.get(result.owasp_id, {
-        "detector": "YARAScanner",
-        "scan_target": "INPUT",
-        "action": "WARN",
-        "category": "unknown",
-        "description": "Unknown vulnerability class",
-    })
+    # Priority: probe-level guardrail_meta > static dict > generic fallback.
+    # This means any new OWASP category probe works without editing this file —
+    # just set guardrail_meta on the probe class.
+    meta = (
+        result.guardrail_meta
+        or _OWASP_GUARDRAIL_META.get(result.owasp_id)
+        or {
+            "detector":    "YARAScanner + SimilarityDetector",
+            "scan_target": "INPUT",
+            "action":      "WARN",
+            "category":    result.owasp_id.lower().replace("llm", "llm_") or "unknown",
+            "description": f"{result.owasp_id} vulnerability — review and add detection rules",
+        }
+    )
 
     patterns = _extract_patterns(result.payload, result.response or "")
 

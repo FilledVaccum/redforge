@@ -61,6 +61,8 @@ class ScanSession:
                 "passed": self.score.passed if self.score else 0,
                 "failed": self.score.failed if self.score else 0,
                 "pass_rate": self.score.pass_rate if self.score else 0.0,
+                # Dynamic per-severity counts — works for any severity level
+                "findings_by_severity": self.score.findings_by_severity if self.score else {},
             },
             "results": [
                 {

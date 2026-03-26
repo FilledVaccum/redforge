@@ -11,6 +11,7 @@ Quick start:
 from typing import Any
 
 from redforge.adapters import get_adapter
+from redforge.core.constants import AUTHORIZATION_CHOICES
 from redforge.core.orchestrator import ScanConfig, ScanReport
 from redforge.core.session import ScanSession
 
@@ -57,9 +58,9 @@ class Scanner:
         Returns:
             ScanReport with all findings and risk score.
         """
-        if authorization not in ("owned", "authorized", "research"):
+        if authorization not in AUTHORIZATION_CHOICES:
             raise ValueError(
-                "authorization must be 'owned', 'authorized', or 'research'. "
+                f"authorization must be one of: {', '.join(AUTHORIZATION_CHOICES)}. "
                 "You must confirm you have permission to scan this model."
             )
 

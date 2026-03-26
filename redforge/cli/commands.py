@@ -1,10 +1,10 @@
 """RedForge CLI — Typer-based command interface.
 
 Commands:
-  redforge scan       — Run a vulnerability scan
+  redforge scan        — Run a vulnerability scan
   redforge list-probes — List all available probes
-  redforge report     — Render a saved scan result
-  redforge serve      — Start the REST API server
+  redforge report      — Render a saved scan result
+  redforge serve       — Start the REST API server
 """
 
 from __future__ import annotations
@@ -16,14 +16,16 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from redforge.core.constants import AUTHORIZATION_CHOICES, SEVERITY_RICH, VERSION
+
 app = typer.Typer(
     name="redforge",
-    help="🔥 RedForge — LLM Red Teaming & Vulnerability Scanner",
+    help="RedForge — LLM Red Teaming & Vulnerability Scanner",
     add_completion=False,
 )
 console = Console()
 
-BANNER = """[bold red]
+BANNER = f"""[bold red]
 ██████╗ ███████╗██████╗ ███████╗ ██████╗ ██████╗  ██████╗ ███████╗
 ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝
 ██████╔╝█████╗  ██║  ██║█████╗  ██║   ██║██████╔╝██║  ███╗█████╗
@@ -31,31 +33,56 @@ BANNER = """[bold red]
 ██║  ██║███████╗██████╔╝██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
 ╚═╝  ╚═╝╚══════╝╚═════╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
 [/bold red]
-[dim]LLM Red Teaming & Vulnerability Scanner — v0.1.0 — Apache 2.0[/dim]
+[dim]LLM Red Teaming & Vulnerability Scanner — v{VERSION} — Apache 2.0[/dim]
 [yellow]⚠  For authorized use only. Scan only systems you own or have written permission to test.[/yellow]
 """
 
-AUTHORIZATION_CHOICES = ["owned", "authorized", "research"]
+
+def _provider_help() -> str:
+    """Build provider help string dynamically from the adapter registry."""
+    try:
+        from redforge.adapters.factory import _BUILTIN_REGISTRY
+        providers = sorted(_BUILTIN_REGISTRY.keys())
+        return "Model provider: " + ", ".join(providers)
+    except Exception:  # noqa: BLE001
+        return "Model provider (e.g. openai, anthropic, ollama, bedrock)"
+
+
+def _format_help(context: str = "Output") -> str:
+    """Build format help string dynamically from the reporter registry."""
+    try:
+        from redforge.reporters import available_formats
+        fmts = available_formats()
+        return f"{context} format: " + " | ".join(fmts)
+    except Exception:  # noqa: BLE001
+        return f"{context} format: json | sarif | html | markdown"
 
 
 @app.command()
 def scan(
-    provider: str = typer.Option(..., "--provider", "-p", help="Model provider: openai, anthropic, ollama, gemini, bedrock, azure, mistral, rest"),
+    provider: str = typer.Option(..., "--provider", "-p", help=_provider_help()),
     model: str | None = typer.Option(None, "--model", "-m", help="Model name/ID"),
-    authorization: str = typer.Option(..., "--authorization", "-a", help="Authorization type: owned | authorized | research"),
-    probes: str | None = typer.Option(None, "--probes", help="Comma-separated probe IDs. Default: all probes"),
-    system_prompt: str | None = typer.Option(None, "--system-prompt", help="System prompt for the target model"),
-    format: str = typer.Option("markdown", "--format", "-f", help="Output format: json | sarif | html | markdown"),
+    authorization: str = typer.Option(..., "--authorization", "-a",
+                                      help=f"Authorization: {' | '.join(AUTHORIZATION_CHOICES)}"),
+    probes: str | None = typer.Option(None, "--probes",
+                                      help="Comma-separated probe IDs. Default: all probes"),
+    system_prompt: str | None = typer.Option(None, "--system-prompt",
+                                             help="System prompt for the target model"),
+    format: str = typer.Option("markdown", "--format", "-f", help=_format_help()),
     output: Path | None = typer.Option(None, "--output", "-o", help="Save report to file"),
     dry_run: bool = typer.Option(False, "--dry-run", help="List probes without executing"),
-    no_store: bool = typer.Option(False, "--no-store", help="Do not persist scan results to disk"),
-    concurrency: int = typer.Option(3, "--concurrency", help="Number of concurrent probe executions"),
+    no_store: bool = typer.Option(False, "--no-store",
+                                  help="Do not persist scan results to disk"),
+    concurrency: int = typer.Option(3, "--concurrency",
+                                    help="Number of concurrent probe executions"),
 ) -> None:
     """Run a vulnerability scan against a target LLM."""
     console.print(BANNER)
 
     if authorization not in AUTHORIZATION_CHOICES:
-        console.print(f"[red]Error: --authorization must be one of: {', '.join(AUTHORIZATION_CHOICES)}[/red]")
+        console.print(
+            f"[red]Error: --authorization must be one of: {', '.join(AUTHORIZATION_CHOICES)}[/red]"
+        )
         raise typer.Exit(1)
 
     probe_list = [p.strip() for p in probes.split(",")] if probes else None
@@ -65,7 +92,10 @@ def scan(
     from redforge.probes import get_all_probes, get_probe
     from redforge.reporters import get_reporter
 
-    with console.status(f"[bold green]Scanning {provider}/{model or 'default'} with {len(probe_list) if probe_list else 'all'} probes..."):
+    with console.status(
+        f"[bold green]Scanning {provider}/{model or 'default'} "
+        f"with {len(probe_list) if probe_list else 'all'} probes..."
+    ):
         adapter_config: dict[str, str] = {}
         if model:
             adapter_config["model"] = model
@@ -117,7 +147,7 @@ def scan(
     else:
         console.print("\n" + rendered)
 
-    # Exit with non-zero if critical/high findings (for CI/CD pipelines)
+    # Exit with non-zero for CI/CD pipelines if critical/high findings exist
     if s.critical_findings > 0 or s.high_findings > 0:
         raise typer.Exit(1)
 
@@ -128,7 +158,11 @@ def list_probes() -> None:
     from redforge.probes import get_all_probes
 
     probes = get_all_probes()
-    table = Table(title="RedForge Attack Probes", show_header=True, header_style="bold cyan")
+    table = Table(
+        title="RedForge Attack Probes",
+        show_header=True,
+        header_style="bold cyan",
+    )
     table.add_column("ID", style="bold")
     table.add_column("OWASP")
     table.add_column("MITRE ATLAS")
@@ -136,18 +170,16 @@ def list_probes() -> None:
     table.add_column("Payloads", justify="right")
     table.add_column("Description")
 
-    severity_colors = {
-        "critical": "red", "high": "orange3", "medium": "yellow", "low": "green", "info": "dim"
-    }
     for probe in sorted(probes, key=lambda p: p.owasp_id):
-        color = severity_colors.get(probe.severity, "white")
+        # SEVERITY_RICH from constants — any severity gets a color, unknown → "white"
+        color = SEVERITY_RICH.get(probe.severity, "white")
         table.add_row(
             probe.id,
             probe.owasp_id,
             probe.mitre_atlas,
             f"[{color}]{probe.severity.upper()}[/{color}]",
             str(len(probe.payloads())),
-            probe.description[:60] + "..." if len(probe.description) > 60 else probe.description,
+            probe.description[:60] + "…" if len(probe.description) > 60 else probe.description,
         )
 
     console.print(BANNER)
@@ -155,10 +187,39 @@ def list_probes() -> None:
     console.print(f"\n[dim]Total: {len(probes)} probes[/dim]")
 
 
+@app.command(name="list-providers")
+def list_providers() -> None:
+    """List all registered model providers and available formats."""
+    from redforge.adapters.factory import _BUILTIN_REGISTRY, AdapterFactory
+    from redforge.reporters import REPORTERS, available_formats
+
+    # Providers
+    ptable = Table(title="Registered Providers", show_header=True, header_style="bold cyan")
+    ptable.add_column("Provider")
+    ptable.add_column("Adapter Module")
+    all_providers = {**_BUILTIN_REGISTRY, **dict.fromkeys(AdapterFactory._custom_registry, "custom")}
+    for name in sorted(all_providers):
+        ptable.add_row(name, all_providers[name])
+    console.print(ptable)
+
+    # Formats
+    ftable = Table(title="Registered Report Formats", show_header=True, header_style="bold cyan")
+    ftable.add_column("Format")
+    ftable.add_column("Reporter Class")
+    seen: set[type] = set()
+    for fmt in sorted(REPORTERS):
+        cls = REPORTERS[fmt]
+        alias_marker = " (alias)" if cls in seen else ""
+        ftable.add_row(fmt, cls.__name__ + alias_marker)
+        seen.add(cls)
+    console.print(ftable)
+    console.print(f"\n[dim]Primary formats: {', '.join(available_formats())}[/dim]")
+
+
 @app.command()
 def report(
     input_file: Path = typer.Argument(..., help="Path to a saved scan result JSON file"),
-    format: str = typer.Option("html", "--format", "-f", help="Output format: json | sarif | html | markdown"),
+    format: str = typer.Option("html", "--format", "-f", help=_format_help()),
     output: Path | None = typer.Option(None, "--output", "-o", help="Save report to file"),
 ) -> None:
     """Render a saved scan result in a different format."""
@@ -170,14 +231,16 @@ def report(
 
     data = json.loads(input_file.read_text())
 
-    # Reconstruct a minimal report-like object for re-rendering
     console.print(f"[dim]Re-rendering {input_file} as {format}...[/dim]")
 
-    # For re-render we just pretty-print the JSON or convert
     if format == "json":
         rendered = json.dumps(data, indent=2)
     else:
-        rendered = f"# Report: {data.get('session_id','?')}\n\nRisk: {data.get('score',{}).get('risk_level','?')}\n\n> Re-render from saved JSON. Run a live scan for full report.\n"
+        rendered = (
+            f"# Report: {data.get('session_id','?')}\n\n"
+            f"Risk: {data.get('score',{}).get('risk_level','?')}\n\n"
+            "> Re-render from saved JSON. Run a live scan for a full report.\n"
+        )
 
     if output:
         output.write_text(rendered)

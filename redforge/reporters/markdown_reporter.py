@@ -20,6 +20,7 @@ SEVERITY_EMOJI = {
 
 class MarkdownReporter(BaseReporter):
     fmt = "markdown"
+    fmt_aliases = ["md"]
 
     def render(self, report: ScanReport) -> str:
         s = report.score

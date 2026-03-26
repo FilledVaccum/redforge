@@ -5,20 +5,19 @@ from __future__ import annotations
 import html
 from typing import TYPE_CHECKING
 
+from redforge.core.constants import SEVERITY_HEX
 from redforge.reporters.base import BaseReporter
 
 if TYPE_CHECKING:
     from redforge.core.orchestrator import ScanReport
 
-SEVERITY_COLORS = {
-    "critical": "#dc2626",
-    "high": "#ea580c",
-    "medium": "#ca8a04",
-    "low": "#16a34a",
-    "info": "#6b7280",
-}
+# Derived from SEVERITY_HEX — adapts automatically when new severities are added.
+SEVERITY_COLORS = SEVERITY_HEX
 
-# Per-OWASP remediation guidance
+# Per-OWASP remediation guidance.
+# Reporters use ProbeResult.remediation first (set by probe class).
+# This dict is the fallback for probes that don't set their own remediation text.
+# Entries here cover LLM01–LLM10; new OWASP categories handled by probe-level metadata.
 _OWASP_REMEDIATION: dict[str, str] = {
     "LLM01": "Implement prompt hardening: use structured message formats, validate input boundaries, deploy instruction hierarchy enforcement. Test with adversarial prompt suites before production.",
     "LLM02": "Audit training data for PII memorization. Deploy output filtering for credentials and personal data. Consider differential privacy techniques for fine-tuning.",
@@ -172,15 +171,28 @@ class HTMLReporter(BaseReporter):
             f"The overall risk score is <strong>{s.risk_score:.1f}/10 ({html.escape(s.risk_level)})</strong>. ",
         ]
 
-        if s.critical_findings > 0:
-            lines.append(
-                f"<strong style='color:#dc2626'>{s.critical_findings} critical finding(s)</strong> require immediate remediation. "
-                "Critical vulnerabilities indicate the model can be manipulated to abandon safety constraints or take unauthorized actions."
-            )
-        if s.high_findings > 0:
-            lines.append(
-                f"<strong style='color:#ea580c'>{s.high_findings} high-severity finding(s)</strong> should be addressed before production deployment."
-            )
+        # Dynamically emit severity callouts for any severity level with findings
+        from redforge.core.constants import SEVERITY_HEX, SEVERITY_WEIGHTS
+        sev_order = sorted(
+            s.findings_by_severity.items(),
+            key=lambda kv: SEVERITY_WEIGHTS.get(kv[0], 0.5),
+            reverse=True,
+        )
+        for sev, cnt in sev_order:
+            color = SEVERITY_HEX.get(sev, "#6b7280")
+            if sev == "critical":
+                lines.append(
+                    f"<strong style='color:{color}'>{cnt} critical finding(s)</strong> require immediate remediation. "
+                    "Critical vulnerabilities indicate the model can be manipulated to abandon safety constraints."
+                )
+            elif sev == "high":
+                lines.append(
+                    f"<strong style='color:{color}'>{cnt} high-severity finding(s)</strong> should be addressed before production deployment."
+                )
+            elif cnt > 0:
+                lines.append(
+                    f"<strong style='color:{color}'>{cnt} {sev}-severity finding(s)</strong> identified."
+                )
 
         lines.append(
             "Prioritize remediating the highest-severity findings first. See per-finding remediation guidance below."
@@ -196,7 +208,15 @@ class HTMLReporter(BaseReporter):
         for r in sorted(failures, key=lambda x: x.score, reverse=True):
             color = SEVERITY_COLORS.get(r.severity, "#6b7280")
             bar_width = int(r.score * 100)
-            remediation = _OWASP_REMEDIATION.get(r.owasp_id, "Review the OWASP LLM Top 10 guidance for this category.")
+            # Probe-level remediation takes priority; fall back to static dict,
+            # then to a generic message for categories not yet in the dict.
+            remediation = (
+                r.remediation
+                or _OWASP_REMEDIATION.get(r.owasp_id)
+                or f"Review OWASP guidance for {r.owasp_id}. "
+                   "Implement appropriate input validation, output filtering, "
+                   "and model hardening for this vulnerability class."
+            )
             tags_html = " ".join(f'<span class="tag">{html.escape(t)}</span>' for t in r.tags[:5])
             # SECURITY: evidence is our own text — still escaped. Response is NOT rendered.
             parts.append(f"""
