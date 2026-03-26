@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from redforge.adapters.adapter_config import AdapterConfig
 from redforge.adapters.factory import AdapterFactory, AvailableModel, HealthCheckResult
+from redforge.adapters.huggingface_adapter import clear_strategy_cache
 from redforge.adapters.model_catalog import (
     MODEL_CATALOG,
     ModelSpec,
@@ -92,4 +93,6 @@ __all__ = [
     "AvailableModel",
     # Backward compat
     "get_adapter",
+    # HuggingFace utilities
+    "clear_strategy_cache",
 ]
