@@ -18,7 +18,7 @@
 
 <br/>
 
-RedForge is a comprehensive LLM security testing platform — **47 probes**, **9 provider adapters**, **multi-turn attack orchestration**, **17-strategy mutation engine**, **YARA-style detection**, and **compliance reporting** for NIST AI RMF, EU AI Act, ISO/IEC 42001, and OWASP LLM Top 10.
+RedForge is a comprehensive LLM security testing platform — **47 probes**, **10 provider adapters** including **any model on HuggingFace Hub**, **72-model catalog**, **named connection profiles**, **multi-turn attack orchestration**, **17-strategy mutation engine**, **auto-generated audit + guardrail reports**, and **compliance reporting** for NIST AI RMF, EU AI Act, ISO/IEC 42001, and OWASP LLM Top 10.
 
 [**Docs**](https://redforge.vercel.app) · [**Quick Start**](#quick-start) · [**Probes**](#probes-47) · [**Providers**](#providers) · [**API Reference**](https://redforge.vercel.app/docs/api-reference.html)
 
@@ -42,7 +42,7 @@ RedForge is a comprehensive LLM security testing platform — **47 probes**, **9
 | NIST AI RMF / EU AI Act reports | ✅ | ❌ | ❌ | ❌ | ✅ |
 | YAML declarative config | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Bidirectional guardrail pipeline | ✅ | ❌ | ❌ | ❌ | ❌ |
-| 9 provider adapters | ✅ | Partial | ✅ | Partial | Partial |
+| 10 provider adapters + any HuggingFace model | ✅ | Partial | ✅ | Partial | Partial |
 | Docker + CI-ready | ✅ | Partial | ✅ | Partial | ❌ |
 
 ---
@@ -81,8 +81,14 @@ Standardized Attack Success Rate (ASR) metrics against AdvBench (520 behaviors),
 **📋 Compliance Reports**
 Auto-generate gap reports for NIST AI RMF, EU AI Act (Art. 9/10/13/15/16/72), ISO/IEC 42001, GDPR, and OWASP LLM Top 10 from a single scan.
 
-**🔌 9 Provider Adapters**
-OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure OpenAI, Mistral, Ollama (local), and any generic REST endpoint.
+**🔌 10 Provider Adapters**
+OpenAI, Anthropic, Google Gemini, AWS Bedrock (6 model families), Azure OpenAI, Mistral, Ollama (local), HuggingFace Hub (any of millions of models), and any generic REST endpoint.
+
+**🗂️ 72-Model Catalog + Named Profiles**
+Pre-configured specs for 72 models across all providers. Reference any by name: `AdapterFactory.from_profile("claude-3-5-sonnet")`. 132 built-in profiles, zero config required.
+
+**📋 Auto-Generated Audit + Guardrail Reports**
+Every scan automatically writes a full JSONL audit log (every payload, response, score) and a failures JSON structured for direct import into your guardrail pipeline (YARA rules, similarity detectors, recommended actions).
 
 </td>
 </tr>
@@ -124,6 +130,18 @@ redforge scan --provider openai --authorization research \
 # Output SARIF for GitHub Code Scanning
 redforge scan --provider openai --authorization owned \
   --format sarif --output results.sarif
+
+# Scan any HuggingFace model — no catalog entry needed
+redforge scan \
+  --provider huggingface \
+  --model "mistralai/Mistral-7B-Instruct-v0.3" \
+  --authorization owned
+
+# Use a named profile
+redforge scan --provider my-prod-gpt4 --authorization authorized
+
+# List all registered providers and report formats
+redforge list-providers
 
 # Start REST API server
 redforge serve --port 8000
@@ -253,16 +271,194 @@ open http://localhost:8000/docs
 
 ## Providers
 
-| Provider | Install | Env Var |
-|----------|---------|---------|
-| **OpenAI** | `pip install "redforge[openai]"` | `OPENAI_API_KEY` |
-| **Anthropic** | `pip install "redforge[anthropic]"` | `ANTHROPIC_API_KEY` |
-| **Google Gemini** | `pip install "redforge[gemini]"` | `GOOGLE_API_KEY` |
-| **AWS Bedrock** | `pip install "redforge[bedrock]"` | AWS credentials env |
-| **Azure OpenAI** | base install | `AZURE_OPENAI_API_KEY` + `AZURE_OPENAI_ENDPOINT` |
-| **Mistral** | `pip install "redforge[mistral]"` | `MISTRAL_API_KEY` |
-| **Ollama** | base install | none (local) |
-| **Generic REST** | base install | `REDFORGE_REST_API_KEY` (optional) |
+| Provider | Install | Env Var | Notes |
+|----------|---------|---------|-------|
+| **OpenAI** | `pip install "redforge[openai]"` | `OPENAI_API_KEY` | GPT-4o, GPT-4o-mini, o1, o3 |
+| **Anthropic** | `pip install "redforge[anthropic]"` | `ANTHROPIC_API_KEY` | Claude 3.5, Claude 3 Opus |
+| **Google Gemini** | `pip install "redforge[gemini]"` | `GOOGLE_API_KEY` | Gemini 1.5 Pro/Flash, Gemini 2.0 |
+| **AWS Bedrock** | `pip install "redforge[bedrock]"` | AWS credentials env | 6 model families auto-detected |
+| **Azure OpenAI** | base install | `AZURE_OPENAI_API_KEY` + `AZURE_OPENAI_ENDPOINT` | Deployment name support |
+| **Mistral** | `pip install "redforge[mistral]"` | `MISTRAL_API_KEY` | Mistral Large, Codestral |
+| **Ollama** | base install | none | 100% local, zero cost |
+| **HuggingFace** | `pip install huggingface_hub` | `HF_TOKEN` (gated models) | **Any model on the Hub** |
+| **Generic REST** | base install | `REDFORGE_REST_API_KEY` (opt.) | Any OpenAI-compat endpoint |
+
+### HuggingFace — any model on the Hub
+
+RedForge works with **any** of the millions of models on HuggingFace Hub — not just a fixed list. The adapter automatically detects the right API strategy for each model via the Hub API and falls back through a full waterfall if needed.
+
+```python
+from redforge.adapters import AdapterFactory
+
+# Serverless Inference API — any public model
+adapter = AdapterFactory.from_spec("huggingface/mistralai/Mistral-7B-Instruct-v0.3")
+adapter = AdapterFactory.from_spec("huggingface/google/flan-t5-large")       # encoder-decoder
+adapter = AdapterFactory.from_spec("huggingface/facebook/blenderbot-400M-distill")  # dialog
+
+# Gated models (set HF_TOKEN env var)
+adapter = AdapterFactory.from_spec("huggingface/meta-llama/Meta-Llama-3.1-70B-Instruct")
+
+# Your Dedicated Inference Endpoint
+adapter = AdapterFactory.from_spec("huggingface/my-model@https://xyz.endpoints.huggingface.cloud")
+
+# Self-hosted TGI server (auto-detected from :8080)
+adapter = AdapterFactory.from_spec("huggingface/tgi@http://my-gpu:8080")
+
+# Local — runs on this machine, no network during scan
+adapter = AdapterFactory.from_dict({
+    "provider": "huggingface",
+    "model": "microsoft/Phi-3.5-mini-instruct",
+    "mode": "local",
+})
+```
+
+**Strategy detection waterfall** (automatic, cached per model, 1 h TTL):
+1. Hub API lookup → `pipeline_tag` → best starting strategy
+2. `chat_completion` (OpenAI-compat Messages API)
+3. `text_generation` (base/instruct models)
+4. `text2text_generation` (T5, BART, Flan-T5, mT5)
+5. `conversational` (BlenderBot, legacy dialog)
+
+Works for any model that produces text — including ones that don't exist yet.
+
+---
+
+## Adapter Middle Layer
+
+RedForge includes a garak-style flexible adapter system so you can connect to any provider/model/endpoint without modifying core code.
+
+### AdapterFactory
+
+```python
+from redforge.adapters import AdapterFactory
+
+# Spec string — most concise
+adapter = AdapterFactory.from_spec("openai/gpt-4o")
+adapter = AdapterFactory.from_spec("bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0@us-west-2")
+adapter = AdapterFactory.from_spec("ollama/llama3:70b@http://remote-server:11434")
+
+# Named profile (built-in or user-defined)
+adapter = AdapterFactory.from_profile("claude-3-5-sonnet")   # 132 built-in profiles
+adapter = AdapterFactory.from_profile("my-prod-gpt4")        # from redforge.profiles.yaml
+
+# Typed config
+from redforge.adapters import AdapterConfig
+config = AdapterConfig(provider="openai", model="gpt-4o", max_tokens=2048, timeout=60.0)
+adapter = AdapterFactory.from_config(config)
+
+# Health check before scanning
+result = await AdapterFactory.health_check("openai/gpt-4o")
+print(result.ok, result.latency_ms)
+
+# Auto-detect what's available in current environment
+available = await AdapterFactory.detect_available()
+for m in available:
+    print(m.spec, m.detection_method)
+```
+
+### Named Profiles
+
+```yaml
+# redforge.profiles.yaml  (project-local, or ~/.redforge/profiles.yaml for global)
+profiles:
+  my-prod-claude:
+    description: "Production Claude 3.5 Sonnet"
+    provider: anthropic
+    model: claude-3-5-sonnet-20241022
+    max_tokens: 2048
+    tags: [production]
+
+  local-free:
+    provider: ollama
+    model: phi3.5
+    tags: [local, free, ci]
+```
+
+```bash
+redforge scan --provider my-prod-claude --authorization authorized
+```
+
+Copy `redforge.profiles.yaml.example` from the repo for a complete reference covering all 72 catalog models.
+
+---
+
+## Report Formats
+
+Every scan automatically produces three output files — no flags needed:
+
+| File | Format | Purpose |
+|------|--------|---------|
+| `redforge_{id}_{ts}.json` | JSON | Session summary, scores, per-probe results |
+| `redforge_{id}_{ts}_audit.jsonl` | JSONL | **Full audit log** — every payload, model response, score, sha256 |
+| `redforge_{id}_{ts}_failures.json` | JSON | **Guardrail improvement** — failed probes only, YARA templates, detection patterns |
+
+Additional formats via `--format`:
+
+| Format | Flag | Use case |
+|--------|------|----------|
+| **HTML** | `--format html` | Executive report with compliance table |
+| **Markdown** | `--format markdown` | GitHub PR comments, CI annotations |
+| **SARIF 2.1** | `--format sarif` | GitHub Code Scanning / security tab |
+| **JSON** | `--format json` | Machine-readable, pipeline integration |
+| **Audit JSONL** | `--format audit` | Stream-friendly full audit trail |
+| **Failures JSON** | `--format failures` | Feed directly into guardrail pipeline |
+
+### Audit Log (JSONL)
+
+Each line is a self-contained JSON object — grep-able, stream-parseable, no loading the whole file.
+
+```jsonc
+{"event":"session_start","session_id":"...","model":"gpt-4o","timestamp":"..."}
+{"event":"probe_result","probe_id":"prompt_injection_basic","owasp_id":"LLM01",
+ "severity":"critical","passed":false,"score":0.92,
+ "attack":{"payload":"...","sha256":"abc123..."},
+ "model_output":{"response":"...","sha256":"def456..."},
+ "result":{"verdict":"FAIL","evidence":"Model complied with injection instruction"}}
+{"event":"session_end","total_probes":47,"failed":3,"risk_level":"HIGH","risk_score":7.4}
+```
+
+### Failures Report (Guardrail Improvement)
+
+Structured JSON ready to feed into `YARAScanner.add_rule()` or `SimilarityDetector.add_reference()`:
+
+```jsonc
+{
+  "schema": "redforge-failures-v1",
+  "failures": [{
+    "probe_id": "prompt_injection_basic",
+    "owasp_id": "LLM01",
+    "guardrail": {
+      "detector": "YARAScanner + SimilarityDetector",
+      "scan_target": "INPUT",
+      "action": "BLOCK",
+      "input_patterns": ["ignore all previous", "disregard instructions"],
+      "yara_rule_template": {
+        "rule_name": "RF_LLM01_prompt_injection_basic",
+        "strings": ["ignore all previous", "disregard instructions"],
+        "usage": "scanner.add_rule(yara_rule_template)"
+      }
+    }
+  }],
+  "guardrail_summary": {
+    "input_scanner_gaps": ["prompt_injection_basic"],
+    "priority_actions": ["Add YARA rule RF_LLM01_...", "Add similarity reference"]
+  }
+}
+```
+
+---
+
+## Extensibility
+
+RedForge is built so every extension point requires **only adding files, never editing existing ones**:
+
+| What you add | What you need to do |
+|---|---|
+| **New probe** (new OWASP category, new attack) | Create one file in `redforge/probes/`. Auto-discovered. Set `remediation`, `guardrail_meta`, `compliance` on the class — reporters use them automatically. |
+| **New reporter** (CSV, Splunk, XLSX…) | Create one file in `redforge/reporters/`. Subclass `BaseReporter`, set `fmt`. Auto-discovered. |
+| **New severity level** | Two lines in `core/constants.py` + one line in `core/scorer.py`. Every reporter and the CLI adapt automatically. |
+| **New provider** | One line in `adapters/factory.py` registry. CLI help text is derived from the registry at runtime. |
+| **New auth type** | One line in `core/constants.py`. Both CLI and SDK pick it up. |
 
 ---
 
