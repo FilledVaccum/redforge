@@ -114,7 +114,9 @@ class Orchestrator:
         session.finish(score)
         session.save()
 
-        return ScanReport(session)
+        report = ScanReport(session)
+        _save_auto_reports(report)
+        return report
 
     async def _run_single_probe(
         self, probe: BaseProbe, session: ScanSession
@@ -168,3 +170,44 @@ class Orchestrator:
             for result in result_group:
                 session.add_result(result)
                 yield result
+
+
+def _save_auto_reports(report: ScanReport) -> None:
+    """Always emit audit log + failures file alongside every scan.
+
+    These two files are generated unconditionally — the user never needs to
+    pass a flag. They land in the same output_dir as the session JSON.
+
+    Files written:
+      {output_dir}/{sid}_audit.jsonl   — full audit: every probe, payload, response
+      {output_dir}/{sid}_failures.json — failed probes only, structured for guardrail work
+    """
+    from redforge.reporters.audit_reporter import AuditReporter
+    from redforge.reporters.failures_reporter import FailuresReporter
+
+    if not report.session.store_results:
+        return
+
+    session = report.session
+    output_dir = session.output_dir
+    ts = session.started_at.strftime("%Y%m%d_%H%M%S") if session.started_at else "unknown"
+    sid = session.session_id[:8]
+    stem = f"redforge_{sid}_{ts}"
+
+    try:
+        audit_path = output_dir / f"{stem}_audit.jsonl"
+        AuditReporter().save(report, audit_path)
+        logger.info("[audit]    %s", audit_path)
+    except Exception as exc:
+        logger.warning("Failed to write audit log: %s", exc)
+
+    failures = [r for r in report.results if not r.passed]
+    if failures:
+        try:
+            failures_path = output_dir / f"{stem}_failures.json"
+            FailuresReporter().save(report, failures_path)
+            logger.info("[failures] %s", failures_path)
+        except Exception as exc:
+            logger.warning("Failed to write failures report: %s", exc)
+    else:
+        logger.info("[failures] No failures — skipping failures.json")
