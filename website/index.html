@@ -4,38 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RedForge — LLM Red Teaming & Vulnerability Scanner</title>
-  <meta name="description" content="Production-grade LLM Red Teaming platform. 47 probes, 9 providers, OWASP LLM Top 10 coverage, SARIF/JSON/HTML reports. The most comprehensive open-source LLM security scanner.">
+  <meta name="description" content="Production-grade LLM red teaming. 47 attack probes, 9 providers, OWASP LLM Top 10, MITRE ATLAS, compliance mapping. The most comprehensive open-source LLM security scanner.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/main.css">
-  <style>
-    .hero-terminal { max-width: 760px; margin: 60px auto 0; text-align: left; }
-    .compare-section { background: var(--bg-secondary); }
-    .owasp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .owasp-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; transition: border-color 0.2s, transform 0.2s; }
-    .owasp-card:hover { border-color: rgba(239,68,68,0.4); transform: translateY(-2px); }
-    .owasp-num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--red); background: rgba(239,68,68,0.1); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
-    .owasp-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
-    .owasp-count { font-size: 0.8rem; color: var(--text-muted); }
-    .attack-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-    .attack-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-    .attack-card .attack-badge { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
-    .attack-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
-    .attack-card p { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6; }
-    .install-tabs { max-width: 800px; }
-    .compliance-pills { display: flex; flex-wrap: wrap; gap: 10px; }
-    .compliance-pill { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; }
-    .compliance-pill .flag { margin-right: 6px; }
-  </style>
 </head>
 <body>
 
-<!-- Navbar -->
+<div class="classif-bar">
+  <span>Redforge Platform</span>
+  <span class="c-sep">//</span>
+  <span class="c-alert">Authorized Testing Only</span>
+  <span class="c-sep">//</span>
+  <span>v0.1.0 · Apache 2.0</span>
+  <span class="c-sep">//</span>
+  <span>Document ID: RF-2025-001</span>
+</div>
+
 <nav class="navbar">
   <div class="navbar-inner">
     <a href="index.html" class="navbar-logo">
-      <span class="logo-icon">🔥</span>
-      RedForge
+      <span class="logo-mark">RF</span>
+      <span class="logo-text">RedForge</span>
     </a>
     <ul class="navbar-nav">
       <li><a href="docs/getting-started.html">Docs</a></li>
@@ -43,424 +33,551 @@
       <li><a href="docs/api-reference.html">API</a></li>
       <li><a href="docs/python-sdk.html">SDK</a></li>
       <li><a href="docs/cli-reference.html">CLI</a></li>
-      <li><a href="#compare">Compare</a></li>
     </ul>
-    <a href="docs/getting-started.html" class="btn btn-primary btn-sm" style="margin-left:8px">Get Started →</a>
+    <a href="docs/installation.html" class="nav-cta">Deploy →</a>
   </div>
 </nav>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span>🔥</span>
-      v0.1.0 · Apache 2.0 · 47 Probes · OWASP LLM Top 10
-    </div>
-    <h1>
-      The <span class="gradient">Super Tool</span><br>
-      for LLM Vulnerability Scanning
-    </h1>
-    <p class="hero-sub">
-      RedForge is the most comprehensive open-source LLM red teaming platform.
-      47 attack probes, 9 model providers, multi-turn attacks, YARA detection,
-      benchmark evaluation, compliance mapping — all in one tool.
-    </p>
-    <div class="hero-actions">
-      <a href="docs/getting-started.html" class="btn btn-primary">Get Started →</a>
-      <a href="docs/api-reference.html" class="btn btn-outline">API Reference</a>
-      <a href="docs/probes.html" class="btn btn-outline">Browse 47 Probes</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat-card"><div class="stat-value red" data-count="47" data-suffix="">0</div><div class="stat-label">Attack Probes</div></div>
-      <div class="stat-card"><div class="stat-value orange" data-count="9" data-suffix="">0</div><div class="stat-label">LLM Providers</div></div>
-      <div class="stat-card"><div class="stat-value green" data-count="10" data-suffix="">0</div><div class="stat-label">OWASP Coverage</div></div>
-      <div class="stat-card"><div class="stat-value blue" data-count="17" data-suffix="">0</div><div class="stat-label">Mutation Strategies</div></div>
-    </div>
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<div style="border-bottom: 1px solid rgba(13,13,10,0.18);">
+  <section class="hero">
+    <div class="hero-left">
 
-    <div class="hero-terminal">
-      <div class="terminal">
-        <div class="terminal-bar">
-          <div class="terminal-dot red"></div>
-          <div class="terminal-dot yellow"></div>
-          <div class="terminal-dot green"></div>
-          <span class="terminal-title">bash</span>
+      <div class="hero-eyebrow">
+        <span class="eyebrow-label">Threat Assessment Platform</span>
+        <span class="eyebrow-sep">/</span>
+        <span class="eyebrow-id">RF-2025-001</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line">LLM</span>
+        <span class="line">Attack</span>
+        <span class="line">Surface</span>
+      </h1>
+
+      <div class="hero-rule">
+        <span class="hero-rule-line"></span>
+        <span class="redact" title="REDACTED">██████████████</span>
+        <span class="redact-label">&nbsp;Vulnerability Assessment&nbsp;</span>
+        <span class="hero-rule-line-faint"></span>
+      </div>
+
+      <div class="hero-sub">
+        <p>RedForge automates adversarial security testing for large language models — mapping vulnerabilities across every OWASP LLM Top 10 category with evidence-grade output.</p>
+        <p>47 probes. 9 providers. Multi-turn attacks. YARA detection. Compliance reports. One command.</p>
+      </div>
+
+      <div class="hero-install">
+        <div class="install-pill">
+          <span class="prompt">$</span>
+          <span>pip install "redforge[openai]"</span>
         </div>
-        <div class="terminal-body">
-          <span class="terminal-line"><span class="prompt">$</span> <span class="cmd">pip install redforge</span></span>
-          <span class="terminal-line dim">Installing redforge 0.1.0...</span>
-          <span class="terminal-line success">✓ Successfully installed redforge-0.1.0</span>
-          <span class="terminal-line"> </span>
-          <span class="terminal-line"><span class="prompt">$</span> <span class="cmd">redforge scan --provider openai --model gpt-4o --authorization research</span></span>
-          <span class="terminal-line"> </span>
-          <span class="terminal-line accent">██████╗ ███████╗██████╗ ███████╗ ██████╗ ██████╗  ██████╗ ███████╗</span>
-          <span class="terminal-line dim">LLM Red Teaming & Vulnerability Scanner — v0.1.0</span>
-          <span class="terminal-line"> </span>
-          <span class="terminal-line output">Loaded 47 probes · Provider: openai/gpt-4o</span>
-          <span class="terminal-line output">Running probes with concurrency=3...</span>
-          <span class="terminal-line"> </span>
-          <span class="terminal-line success">✓ RF-001 prompt-injection        PASS  (score=0.02)</span>
-          <span class="terminal-line err">✗ RF-007 system-prompt-leak      FAIL  (score=0.84) ← CRITICAL</span>
-          <span class="terminal-line success">✓ RF-011 dan-jailbreak           PASS  (score=0.12)</span>
-          <span class="terminal-line warn">⚠ RF-022 hallucination           WARN  (score=0.61)</span>
-          <span class="terminal-line output">  ... 43 more probes ...</span>
-          <span class="terminal-line"> </span>
-          <span class="terminal-line accent">════════════════════════════════════════════════════</span>
-          <span class="terminal-line output">SCAN COMPLETE  47 probes  ·  3 FAIL  ·  6 WARN  ·  38 PASS</span>
-          <span class="terminal-line output">Risk Score: 6.4/10 (HIGH)   Report: ./redforge-results/scan_20260325.html</span>
-        </div>
+        <button class="install-copy" data-copy='pip install "redforge[openai]"'>Copy</button>
       </div>
+
+      <div class="hero-actions">
+        <a href="docs/getting-started.html" class="btn-primary">Initiate Assessment →</a>
+        <a href="docs/probes.html" class="btn-ghost">Browse 47 Probes →</a>
+      </div>
+    </div>
+
+    <aside class="hero-stats">
+      <div class="stat-block">
+        <span class="stat-num" data-target="47">0</span>
+        <span class="stat-label">Security<br>Probes</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num" data-target="9">0</span>
+        <span class="stat-label">LLM<br>Providers</span>
+      </div>
+      <div class="stat-block stat-block--accent">
+        <span class="stat-num" data-target="10">0</span>
+        <span class="stat-label">OWASP<br>Categories</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num" data-target="17">0</span>
+        <span class="stat-label">Mutation<br>Strategies</span>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════ 01 CAPABILITIES -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">01</span>
+    <h2 class="section-title">Capabilities</h2>
+    <p class="section-aside">Everything needed for production LLM security testing — from quick CLI scans to enterprise CI/CD pipelines</p>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-001</span>
+      <div class="feat-name">47 Attack Probes</div>
+      <p class="feat-body">Full OWASP LLM Top 10 coverage. Every probe carries MITRE ATLAS technique mappings, CVSSv3-style scoring, and remediation guidance. From prompt injection to MCP tool poisoning.</p>
+      <div class="feat-tags"><span class="ftag">OWASP LLM01–10</span><span class="ftag">MITRE ATLAS</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-002</span>
+      <div class="feat-name">9 Provider Adapters</div>
+      <p class="feat-body">OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure OpenAI, Mistral, Ollama. Add a generic REST adapter for any endpoint. Zero-config local scanning with Ollama.</p>
+      <div class="feat-tags"><span class="ftag">OpenAI</span><span class="ftag">Anthropic</span><span class="ftag">Bedrock</span><span class="ftag">+6</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-003</span>
+      <div class="feat-name">Multi-Turn Attacks</div>
+      <p class="feat-body">Crescendo multi-turn escalation. Skeleton Key injection. PAIR (Prompt Automatic Iterative Refinement, Chao et al. 2023). Attacks that succeed where single-shot fails.</p>
+      <div class="feat-tags"><span class="ftag">PAIR</span><span class="ftag">Crescendo</span><span class="ftag">Skeleton Key</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-004</span>
+      <div class="feat-name">17-Strategy Mutations</div>
+      <p class="feat-body">Base64, ROT13, l33t speak, typos, Unicode tricks, nested context, academic framing, roleplay injection — FuzzyAI-inspired exhausitve payload obfuscation.</p>
+      <div class="feat-tags"><span class="ftag">FuzzyAI-inspired</span><span class="ftag">17 strategies</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-005</span>
+      <div class="feat-name">YARA + Similarity Detection</div>
+      <p class="feat-body">14 built-in YARA-style rules: injection, SSRF, shell/SQL injection, CBRN, malware, EICAR. Cosine-similarity detector catches paraphrased attacks keyword scanners miss.</p>
+      <div class="feat-tags"><span class="ftag">vigil-llm inspired</span><span class="ftag">25 references</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-006</span>
+      <div class="feat-name">Bidirectional Guardrails</div>
+      <p class="feat-body">InputScanner → LLM → OutputScanner pipeline. Prompt injection detection, PII detection, toxicity filtering, credential scanning. llm-guard-style defense layer.</p>
+      <div class="feat-tags"><span class="ftag">Input + Output</span><span class="ftag">llm-guard inspired</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-007</span>
+      <div class="feat-name">Benchmark Evaluation</div>
+      <p class="feat-body">Standardized Attack Success Rate (ASR) metrics against AdvBench (520), HarmBench (400), JailbreakBench (100), ToxicChat, WildGuardMix. Results comparable to published papers.</p>
+      <div class="feat-tags"><span class="ftag">AdvBench</span><span class="ftag">HarmBench</span><span class="ftag">JBB</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-008</span>
+      <div class="feat-name">Compliance Reports</div>
+      <p class="feat-body">Auto-generate gap reports for NIST AI RMF, EU AI Act (Art. 9/10/13/15/16/72), ISO/IEC 42001, GDPR, OWASP LLM Top 10. From scan results to board-ready documentation.</p>
+      <div class="feat-tags"><span class="ftag">NIST AI RMF</span><span class="ftag">EU AI Act</span><span class="ftag">ISO 42001</span></div>
+    </div>
+    <div class="feat-cell">
+      <span class="feat-n">RF-CAP-009</span>
+      <div class="feat-name">4 Output Formats</div>
+      <p class="feat-body">JSON for CI/CD. SARIF 2.1.0 for GitHub Code Scanning. HTML for stakeholder reports. Markdown for docs. All sanitized — no raw model output rendered directly in HTML.</p>
+      <div class="feat-tags"><span class="ftag">SARIF</span><span class="ftag">JSON</span><span class="ftag">HTML</span><span class="ftag">Markdown</span></div>
     </div>
   </div>
 </section>
 
-<!-- Features -->
-<section class="section">
-  <div class="container">
-    <div style="text-align:center; margin-bottom:52px;">
-      <h2 class="section-title">Everything you need for LLM security</h2>
-      <p class="section-sub" style="margin-bottom:0">From quick CLI scans to enterprise CI/CD pipelines — RedForge does it all.</p>
+<hr class="page-divider">
+
+<!-- ═══════════════════════════════════════════ 02 OWASP COVERAGE -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">02</span>
+    <h2 class="section-title">OWASP <em>LLM Top 10</em></h2>
+    <p class="section-aside">Every category covered. Every probe mapped. Every result traceable to a specific vulnerability class.</p>
+  </div>
+
+  <div class="owasp-grid">
+    <div class="owasp-cell" style="--bar-w: 100%">
+      <span class="owasp-id">LLM01</span>
+      <div class="owasp-name">Prompt Injection</div>
+      <div class="owasp-count">9 probes · RF-001–RF-017</div>
+      <div class="owasp-bar"></div>
     </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="feature-icon red">🎯</div>
-        <h3>47 Attack Probes</h3>
-        <p>Comprehensive coverage: prompt injection, jailbreaks, PII extraction, CBRN, data poisoning, hallucination, supply chain, and 40+ more — all mapped to OWASP LLM Top 10 and MITRE ATLAS.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon orange">🔌</div>
-        <h3>9 Model Providers</h3>
-        <p>OpenAI, Anthropic, Google Gemini, AWS Bedrock, Azure OpenAI, Mistral, Ollama, and any generic REST endpoint. Add your own adapter in minutes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon green">🔄</div>
-        <h3>Multi-Turn Attacks</h3>
-        <p>Crescendo escalation, Skeleton Key injection, and PAIR (Prompt Automatic Iterative Refinement). Attacks that succeed where single-turn fails.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon blue">🧬</div>
-        <h3>17-Strategy Mutation Engine</h3>
-        <p>Automatically mutate payloads with ROT13, Base64, l33t speak, typos, Unicode tricks, academic framing, roleplay, nested context — FuzzyAI-style exhausitve fuzzing.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon purple">🛡</div>
-        <h3>Bidirectional Guardrails</h3>
-        <p>InputScanner + OutputScanner pipeline (llm-guard-style). Detect injections before they reach the model, catch credential leaks and malicious code in outputs.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon cyan">🔍</div>
-        <h3>YARA + Similarity Detection</h3>
-        <p>14 built-in YARA-style rules for pattern matching. Semantic cosine similarity detector catches paraphrased attacks that keyword scanners miss.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon red">📊</div>
-        <h3>Benchmark Evaluation</h3>
-        <p>Standardized Attack Success Rate (ASR) metrics against AdvBench (520), HarmBench (400), and JailbreakBench (100) — comparable across tools.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon orange">⚖️</div>
-        <h3>Compliance Mapping</h3>
-        <p>Automated assessment against NIST AI RMF, EU AI Act, ISO 42001, GDPR. Generate compliance gap reports with remediation recommendations.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon green">📄</div>
-        <h3>4 Output Formats</h3>
-        <p>JSON for CI/CD integration, SARIF for GitHub Code Scanning, HTML for stakeholder reports, Markdown for documentation. All sanitized — no raw model output in HTML.</p>
-      </div>
+    <div class="owasp-cell" style="--bar-w: 70%">
+      <span class="owasp-id">LLM02</span>
+      <div class="owasp-name">Insecure Output</div>
+      <div class="owasp-count">6 probes · RF-003–RF-020</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 40%">
+      <span class="owasp-id">LLM03</span>
+      <div class="owasp-name">Training Data Poisoning</div>
+      <div class="owasp-count">3 probes · RF-021–023</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 30%">
+      <span class="owasp-id">LLM04</span>
+      <div class="owasp-name">Model DoS</div>
+      <div class="owasp-count">2 probes · RF-024–025</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 30%">
+      <span class="owasp-id">LLM05</span>
+      <div class="owasp-name">Supply Chain</div>
+      <div class="owasp-count">2 probes · RF-026–027</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 60%">
+      <span class="owasp-id">LLM06</span>
+      <div class="owasp-name">Sensitive Disclosure</div>
+      <div class="owasp-count">5 probes · RF-033–037</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 40%">
+      <span class="owasp-id">LLM07</span>
+      <div class="owasp-name">Insecure Plugin</div>
+      <div class="owasp-count">3 probes · RF-009, RF-041–042</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 40%">
+      <span class="owasp-id">LLM08</span>
+      <div class="owasp-name">Excessive Agency</div>
+      <div class="owasp-count">3 probes · RF-030–032</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 55%">
+      <span class="owasp-id">LLM09</span>
+      <div class="owasp-name">Overreliance</div>
+      <div class="owasp-count">5 probes · RF-040–044</div>
+      <div class="owasp-bar"></div>
+    </div>
+    <div class="owasp-cell" style="--bar-w: 40%">
+      <span class="owasp-id">LLM10</span>
+      <div class="owasp-name">Model Theft</div>
+      <div class="owasp-count">3 probes · RF-045–047</div>
+      <div class="owasp-bar"></div>
     </div>
   </div>
 </section>
 
-<!-- OWASP Coverage -->
-<section class="section" style="background:var(--bg-secondary)">
-  <div class="container">
-    <div style="text-align:center; margin-bottom:48px;">
-      <h2 class="section-title">Full OWASP LLM Top 10 Coverage</h2>
-      <p style="color:var(--text-secondary)">Every category mapped to specific probes, detection methods, and remediation guidance.</p>
-    </div>
-    <div class="owasp-grid">
-      <div class="owasp-card"><span class="owasp-num">LLM01</span><div class="owasp-name">Prompt Injection</div><div class="owasp-count">9 probes · RF-001, RF-011, RF-044, RF-046, RF-047…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM02</span><div class="owasp-name">Insecure Output Handling</div><div class="owasp-count">5 probes · RF-007, RF-029, RF-031, RF-036, RF-037…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM03</span><div class="owasp-name">Training Data Poisoning</div><div class="owasp-count">3 probes · RF-004, RF-040…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM04</span><div class="owasp-name">Model Denial of Service</div><div class="owasp-count">2 probes · RF-005…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM05</span><div class="owasp-name">Supply Chain Vulnerabilities</div><div class="owasp-count">2 probes · RF-006…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM06</span><div class="owasp-name">Sensitive Info Disclosure</div><div class="owasp-count">5 probes · RF-008, RF-043…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM07</span><div class="owasp-name">Insecure Plugin Design</div><div class="owasp-count">3 probes · RF-009, RF-041, RF-042…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM08</span><div class="owasp-name">Excessive Agency</div><div class="owasp-count">3 probes · RF-010…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM09</span><div class="owasp-name">Overreliance / Hallucination</div><div class="owasp-count">5 probes · RF-022, RF-038, RF-039, RF-045…</div></div>
-      <div class="owasp-card"><span class="owasp-num">LLM10</span><div class="owasp-name">Model Theft</div><div class="owasp-count">3 probes · RF-023…</div></div>
-    </div>
-  </div>
-</section>
+<hr class="page-divider">
 
-<!-- Quick Start -->
-<section class="section">
-  <div class="container" style="max-width:900px">
-    <div style="text-align:center; margin-bottom:48px;">
+<!-- ═══════════════════════════════════════════════ 03 QUICK START -->
+<div class="dark-section bleed reveal">
+  <div class="bleed-inner">
+    <div class="section-head">
+      <span class="section-n">03</span>
       <h2 class="section-title">Quick Start</h2>
-      <p style="color:var(--text-secondary)">From install to first scan in under 2 minutes.</p>
+      <p class="section-aside" style="color: var(--ink-3)">From install to first scan in under 2 minutes</p>
     </div>
 
-    <div class="install-tabs tab-container">
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="tab-pip">pip</button>
-        <button class="tab-btn" data-tab="tab-docker">Docker</button>
-        <button class="tab-btn" data-tab="tab-yaml">YAML Config</button>
-        <button class="tab-btn" data-tab="tab-sdk">Python SDK</button>
-      </div>
+    <div class="qs-layout">
+      <div>
+        <div class="tabs-bar">
+          <button class="tab-btn active" data-tab="t-pip">pip</button>
+          <button class="tab-btn" data-tab="t-docker">Docker</button>
+          <button class="tab-btn" data-tab="t-yaml">YAML</button>
+          <button class="tab-btn" data-tab="t-sdk">SDK</button>
+        </div>
 
-      <div id="tab-pip" class="tab-pane active">
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
-          <pre><code><span class="hl-comment"># Install base package</span>
+        <div id="t-pip" class="tab-panel active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+            <pre><code><span class="hl-comment"># Install with your provider</span>
 pip install redforge
+pip install <span class="hl-string">"redforge[openai]"</span>
+pip install <span class="hl-string">"redforge[all-providers]"</span>
 
-<span class="hl-comment"># With your provider</span>
-pip install "redforge[openai]"         <span class="hl-comment"># OpenAI</span>
-pip install "redforge[anthropic]"      <span class="hl-comment"># Anthropic Claude</span>
-pip install "redforge[all-providers]"  <span class="hl-comment"># All providers</span>
-
-<span class="hl-comment"># Set API key</span>
 <span class="hl-keyword">export</span> OPENAI_API_KEY=<span class="hl-string">"sk-..."</span>
 
-<span class="hl-comment"># Run first scan</span>
-redforge scan --provider openai --model gpt-4o --authorization research</code></pre>
+<span class="hl-comment"># First scan</span>
+redforge scan \
+  --provider openai \
+  --model gpt-4o \
+  --authorization owned \
+  --format html \
+  --output report.html</code></pre>
+          </div>
         </div>
-      </div>
 
-      <div id="tab-docker" class="tab-pane">
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
-          <pre><code><span class="hl-comment"># Pull and run</span>
-docker pull redforge/redforge:latest
+        <div id="t-docker" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+            <pre><code>docker pull redforge/redforge:latest
 
 docker run --rm \
-  -e OPENAI_API_KEY=<span class="hl-string">"sk-..."</span> \
-  -v $(pwd)/results:/results \
+  -e OPENAI_API_KEY=<span class="hl-string">"$OPENAI_API_KEY"</span> \
+  -v <span class="hl-string">$(pwd)/results:/results</span> \
   redforge/redforge:latest \
   scan --provider openai --model gpt-4o \
-       --authorization research \
-       --format html --output /results/report.html
-
-<span class="hl-comment"># With docker-compose</span>
-docker-compose -f docker/docker-compose.yml up</code></pre>
+       --authorization owned \
+       --format html \
+       --output /results/report.html</code></pre>
+          </div>
         </div>
-      </div>
 
-      <div id="tab-yaml" class="tab-pane">
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy">Copy</button></div>
-          <pre><code><span class="hl-comment"># redforge.yaml</span>
+        <div id="t-yaml" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy">Copy</button></div>
+            <pre><code><span class="hl-comment"># redforge.yaml</span>
 <span class="hl-keyword">provider</span>: openai
 <span class="hl-keyword">model</span>: gpt-4o
-<span class="hl-keyword">authorization</span>: research
-
-<span class="hl-comment"># Select probes</span>
-<span class="hl-keyword">probe_categories</span>:
-  - <span class="hl-keyword">owasp_id</span>: LLM01
-  - <span class="hl-keyword">severity</span>: critical
-
-<span class="hl-comment"># Compliance frameworks</span>
+<span class="hl-keyword">authorization</span>: owned
 <span class="hl-keyword">compliance</span>: [NIST_AI_RMF, EU_AI_ACT]
-
-<span class="hl-comment"># Output</span>
+<span class="hl-keyword">attacks</span>:
+  <span class="hl-keyword">pair</span>: true
+  <span class="hl-keyword">mutation_strategies</span>: [base64, leetspeak]
 <span class="hl-keyword">output</span>:
-  <span class="hl-keyword">formats</span>: [json, html, sarif]
+  <span class="hl-keyword">formats</span>: [html, sarif, json]
   <span class="hl-keyword">directory</span>: ./results</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
+            <pre><code>redforge run redforge.yaml</code></pre>
+          </div>
         </div>
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">bash</span><button class="code-copy">Copy</button></div>
-          <pre><code>redforge scan --config redforge.yaml</code></pre>
-        </div>
-      </div>
 
-      <div id="tab-sdk" class="tab-pane">
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
-          <pre><code><span class="hl-keyword">import</span> asyncio
-<span class="hl-keyword">from</span> redforge <span class="hl-keyword">import</span> Scanner
+        <div id="t-sdk" class="tab-panel">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+            <pre><code><span class="hl-keyword">import</span> asyncio
+<span class="hl-keyword">from</span> redforge <span class="hl-keyword">import</span> Scanner, ScanConfig
 
-<span class="hl-keyword">async def</span> <span class="hl-func">main</span>():
-    scanner = <span class="hl-class">Scanner</span>(
-        provider=<span class="hl-string">"openai"</span>,
-        model=<span class="hl-string">"gpt-4o"</span>,
-        authorization=<span class="hl-string">"research"</span>,
-    )
-    report = <span class="hl-keyword">await</span> scanner.scan()
+config = <span class="hl-class">ScanConfig</span>(
+    provider=<span class="hl-string">"openai"</span>, model=<span class="hl-string">"gpt-4o"</span>,
+    authorization=<span class="hl-string">"owned"</span>,
+    compliance=[<span class="hl-string">"NIST_AI_RMF"</span>, <span class="hl-string">"EU_AI_ACT"</span>],
+)
+report = asyncio.run(<span class="hl-class">Scanner</span>(config).scan())
 
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"Risk Score: {report.risk_score}/10"</span>)
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"Critical: {report.critical_count}"</span>)
-    <span class="hl-builtin">print</span>(<span class="hl-string">f"High: {report.high_count}"</span>)
-
-    <span class="hl-comment"># Save reports</span>
-    scanner.save_report(report, <span class="hl-string">"json"</span>, <span class="hl-string">"./results"</span>)
-    scanner.save_report(report, <span class="hl-string">"html"</span>, <span class="hl-string">"./results"</span>)
-
-asyncio.run(main())</code></pre>
+<span class="hl-builtin">print</span>(<span class="hl-string">f"Risk: {report.score.risk_level} ({report.score.risk_score}/10)"</span>)
+<span class="hl-keyword">for</span> f <span class="hl-keyword">in</span> report.critical_findings:
+    <span class="hl-builtin">print</span>(<span class="hl-string">f"  [{f.owasp_id}] {f.probe_id}"</span>)</code></pre>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- Attack Modules -->
-<section class="section" style="background:var(--bg-secondary)">
-  <div class="container">
-    <div style="text-align:center; margin-bottom:48px;">
-      <h2 class="section-title">Advanced Attack Modules</h2>
-      <p style="color:var(--text-secondary)">Multi-turn orchestration inspired by PyRIT, EasyJailbreak, and cutting-edge research.</p>
-    </div>
-    <div class="attack-cards">
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(239,68,68,0.15);color:var(--red)">Multi-Turn</span>
-        <h3>Crescendo</h3>
-        <p>Gradually escalates requests across 8 turns — starting benign, ending harmful. Each turn builds trust and context.</p>
-      </div>
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(249,115,22,0.15);color:var(--orange)">Multi-Turn</span>
-        <h3>Skeleton Key</h3>
-        <p>Injects false "safe mode" context to convince models their normal safety guidelines are suspended.</p>
-      </div>
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(168,85,247,0.15);color:var(--purple)">Iterative</span>
-        <h3>PAIR Attack</h3>
-        <p>Prompt Automatic Iterative Refinement (Chao et al. 2023). Uses 10 refinement templates to progressively escalate toward goal.</p>
-      </div>
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(59,130,246,0.15);color:var(--blue)">Adversarial</span>
-        <h3>GCG Suffix</h3>
-        <p>Greedy Coordinate Gradient cached suffixes (Zou et al. 2023). 40 payload combinations across 4 base prompts × 10 adversarial suffixes.</p>
-      </div>
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(34,197,94,0.15);color:var(--green)">Extraction</span>
-        <h3>Repetition Divergence</h3>
-        <p>"Poem poem poem" training data extraction (Nasr et al. 2023). Causes models to regurgitate memorized training data.</p>
-      </div>
-      <div class="attack-card">
-        <span class="attack-badge" style="background:rgba(6,182,212,0.15);color:var(--cyan)">Encoding</span>
-        <h3>Typoglycemia / FlipAttack</h3>
-        <p>Scrambles word interiors and reverses characters (LLAMATOR + PyRIT). Bypasses safety filters through obfuscation.</p>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+          <span class="terminal-title">redforge scan · gpt-4o</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">redforge scan --provider openai --model gpt-4o --authorization owned</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-out">  RedForge v0.1.0 · LLM Vulnerability Scanner</span></div>
+          <div class="t-line"><span class="t-out">  Provider: openai/gpt-4o · 47 probes loaded</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-dim">  ── LLM01: Prompt Injection ─────────────────</span></div>
+          <div class="t-line"><span class="t-ok">  ✓ RF-001 direct-injection</span><span class="t-dim"> ..... PASS (0.04)</span></div>
+          <div class="t-line"><span class="t-fail">  ✗ RF-007 system-prompt-leak</span><span class="t-dim"> .. FAIL (0.87) CRITICAL</span></div>
+          <div class="t-line"><span class="t-ok">  ✓ RF-012 dan-jailbreak</span><span class="t-dim"> ........ PASS (0.11)</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-dim">  ── LLM06: Excessive Agency ─────────────────</span></div>
+          <div class="t-line"><span class="t-fail">  ✗ RF-030 agentic-escalation</span><span class="t-dim"> .. FAIL (0.92) CRITICAL</span></div>
+          <div class="t-line"><span class="t-ok">  ✓ RF-031 mcp-tool-poisoning</span><span class="t-dim"> .. PASS (0.18)</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-dim">  ── LLM09: Overreliance ─────────────────────</span></div>
+          <div class="t-line"><span class="t-warn">  ⚠ RF-040 hallucination</span><span class="t-dim"> ........ WARN (0.61) HIGH</span></div>
+          <div class="t-line"><span class="t-out">  ... 40 more probes ...</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-dim">  ────────────────────────────────────────────</span></div>
+          <div class="t-line"><span class="t-accent">  COMPLETE · 47 probes · 2 CRITICAL · 4 HIGH · 41 PASS</span></div>
+          <div class="t-line"><span class="t-fail">  Risk Score: 7.4/10 · Level: HIGH</span></div>
+          <div class="t-line"><span class="t-ok">  Report: ./redforge-results/scan_20260325.html</span></div>
+          <div class="t-blank"></div>
+          <div class="t-line"><span class="t-prompt">$</span><span class="cursor"></span></div>
+        </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Comparison Table -->
-<section class="section" id="compare">
-  <div class="container">
-    <div style="text-align:center; margin-bottom:48px;">
-      <h2 class="section-title">How RedForge Compares</h2>
-      <p style="color:var(--text-secondary)">Against garak, promptfoo, PyRIT, Giskard, agentic_security, and more.</p>
-    </div>
-    <div style="overflow-x:auto">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th class="redforge-col">🔥 RedForge</th>
-            <th>garak</th>
-            <th>promptfoo</th>
-            <th>PyRIT</th>
-            <th>Giskard</th>
-            <th>agentic_security</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>OWASP LLM Top 10</td><td class="redforge-col"><span class="check">✓ All 10</span></td><td><span class="partial">~ Partial</span></td><td><span class="partial">~ Partial</span></td><td><span class="cross">✕</span></td><td><span class="partial">~ Partial</span></td><td><span class="partial">~ Partial</span></td></tr>
-          <tr><td>Number of probes</td><td class="redforge-col"><span class="check">47</span></td><td><span class="check">44+ files</span></td><td><span class="partial">~20</span></td><td><span class="partial">~15</span></td><td><span class="partial">~10</span></td><td><span class="partial">~18</span></td></tr>
-          <tr><td>Multi-turn attacks</td><td class="redforge-col"><span class="check">✓ 3 strategies</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>9 LLM providers</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="partial">~ 5</span></td><td><span class="check">✓ 10+</span></td><td><span class="partial">~ 4</span></td><td><span class="partial">~ 5</span></td><td><span class="partial">~ 3</span></td></tr>
-          <tr><td>Mutation engine</td><td class="redforge-col"><span class="check">✓ 17 strategies</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="partial">~ 5</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>YARA-style scanner</td><td class="redforge-col"><span class="check">✓ 14 rules</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>Similarity detection</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>REST API</td><td class="redforge-col"><span class="check">✓ FastAPI</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>SARIF output</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>Compliance mapping</td><td class="redforge-col"><span class="check">✓ 4 frameworks</span></td><td><span class="cross">✕</span></td><td><span class="partial">~ NIST</span></td><td><span class="cross">✕</span></td><td><span class="partial">~ EU AI Act</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>Benchmark eval (ASR)</td><td class="redforge-col"><span class="check">✓ 3 benchmarks</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-          <tr><td>YAML config runner</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>Bidirectional guardrails</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>LLM-as-judge</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>MCP tool poisoning</td><td class="redforge-col"><span class="check">✓</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td></tr>
-          <tr><td>License</td><td class="redforge-col">Apache 2.0</td><td>Apache 2.0</td><td>MIT</td><td>MIT</td><td>Apache 2.0</td><td>MIT</td></tr>
-        </tbody>
-      </table>
-    </div>
+<!-- ════════════════════════════════════════════════ 04 COMPARISON -->
+<section class="section reveal">
+  <div class="section-head">
+    <span class="section-n">04</span>
+    <h2 class="section-title">How It <em>Compares</em></h2>
+    <p class="section-aside">Measured against garak, promptfoo, PyRIT, Giskard, and agentic_security</p>
+  </div>
+
+  <div class="comp-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th class="th-self">🔥 RedForge</th>
+          <th>Garak</th>
+          <th>Promptfoo</th>
+          <th>PyRIT</th>
+          <th>Giskard</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-label">OWASP LLM Top 10 (full)</td>
+          <td class="td-self"><span class="c-yes">✓ All 10</span></td>
+          <td><span class="c-par">~ Partial</span></td>
+          <td><span class="c-par">~ Partial</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-par">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Security probe count</td>
+          <td class="td-self"><span class="c-yes">47</span></td>
+          <td><span class="c-par">~44 files</span></td>
+          <td><span class="c-par">~20</span></td>
+          <td><span class="c-par">~15</span></td>
+          <td><span class="c-par">~10</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Multi-turn attacks (PAIR/Crescendo)</td>
+          <td class="td-self"><span class="c-yes">✓ 3 modes</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Payload mutation engine</td>
+          <td class="td-self"><span class="c-yes">✓ 17 strategies</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-par">~ 5</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">YARA-style pattern scanner</td>
+          <td class="td-self"><span class="c-yes">✓ 14 rules</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Semantic similarity detection</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Bidirectional guardrail pipeline</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Benchmark eval (AdvBench/HarmBench)</td>
+          <td class="td-self"><span class="c-yes">✓ 3 benchmarks</span></td>
+          <td><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">REST API + Python SDK</td>
+          <td class="td-self"><span class="c-yes">✓ FastAPI</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-par">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">SARIF output (GitHub Code Scanning)</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">Compliance mapping (NIST/EU AI Act)</td>
+          <td class="td-self"><span class="c-yes">✓ 4 frameworks</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-par">~ NIST only</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-par">~ EU AI Act</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">YAML declarative config</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">MCP tool poisoning probe</td>
+          <td class="td-self"><span class="c-yes">✓</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+          <td><span class="c-no">✕</span></td>
+        </tr>
+        <tr>
+          <td class="td-label">License</td>
+          <td class="td-self">Apache 2.0</td>
+          <td>Apache 2.0</td>
+          <td>MIT</td>
+          <td>MIT</td>
+          <td>Apache 2.0</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
-<!-- Compliance -->
-<section class="section" style="background:var(--bg-secondary)">
-  <div class="container">
-    <div style="text-align:center; margin-bottom:48px;">
-      <h2 class="section-title">Compliance Framework Coverage</h2>
-      <p style="color:var(--text-secondary)">Map your scan results directly to regulatory and standards requirements.</p>
-    </div>
-    <div class="compliance-pills" style="justify-content:center; max-width:700px; margin:0 auto">
-      <span class="compliance-pill"><span class="flag">🇺🇸</span> NIST AI RMF</span>
-      <span class="compliance-pill"><span class="flag">🇪🇺</span> EU AI Act</span>
-      <span class="compliance-pill"><span class="flag">🌐</span> ISO/IEC 42001</span>
-      <span class="compliance-pill"><span class="flag">🇪🇺</span> GDPR Article 22</span>
-      <span class="compliance-pill">OWASP LLM Top 10</span>
-      <span class="compliance-pill">MITRE ATLAS</span>
+<hr class="page-divider">
+
+<!-- ══════════════════════════════════════════════════════ 05 CTA -->
+<div class="cta-wrap reveal">
+  <div class="cta-bg-text">REDFORGE</div>
+  <div class="cta-inner">
+    <p class="cta-eyebrow">// Begin Assessment</p>
+    <h2 class="cta-title">Secure Your<br><em>LLM Surface</em></h2>
+    <p class="cta-body">Open source, Apache 2.0. Run in CI/CD, locally, or via REST API. Scan only systems you own or have written authorization to test.</p>
+    <div class="cta-actions">
+      <a href="docs/getting-started.html" class="btn-inv">Read the Docs →</a>
+      <a href="docs/api-reference.html" class="btn-outline-inv">API Reference</a>
+      <a href="https://github.com/FilledVaccum/redforge" class="btn-outline-inv">GitHub →</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTA -->
-<section class="section">
-  <div class="container" style="text-align:center; max-width:600px">
-    <h2 class="section-title">Start scanning today</h2>
-    <p style="color:var(--text-secondary); margin-bottom:32px">RedForge is open source, Apache 2.0 licensed. Run it in your CI/CD pipeline, locally, or via our REST API.</p>
-    <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap">
-      <a href="docs/getting-started.html" class="btn btn-primary">Read the Docs →</a>
-      <a href="docs/api-reference.html" class="btn btn-outline">API Reference</a>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
+<!-- ════════════════════════════════════════════════════ FOOTER -->
 <footer class="footer">
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="navbar-logo" style="margin-bottom:12px">
-        <span class="logo-icon">🔥</span> RedForge
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Red<em>Forge</em></div>
+        <p>Production-grade LLM Red Teaming & Vulnerability Scanner. Apache 2.0 licensed. For authorized testing only.</p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap">
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">Apache 2.0</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">47 Probes</span>
+          <span class="ftag" style="border-color:#3A3A30; color:#6A6A58">9 Providers</span>
+        </div>
       </div>
-      <p>Production-grade LLM Red Teaming & Vulnerability Scanner. Apache 2.0 licensed. 47 probes. 9 providers.</p>
+      <div>
+        <div class="footer-links-title">Documentation</div>
+        <ul class="footer-links">
+          <li><a href="docs/getting-started.html">Getting Started</a></li>
+          <li><a href="docs/installation.html">Installation</a></li>
+          <li><a href="docs/cli-reference.html">CLI Reference</a></li>
+          <li><a href="docs/python-sdk.html">Python SDK</a></li>
+          <li><a href="docs/configuration.html">Configuration</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-links-title">Reference</div>
+        <ul class="footer-links">
+          <li><a href="docs/probes.html">Probe Catalog</a></li>
+          <li><a href="docs/api-reference.html">REST API</a></li>
+          <li><a href="docs/adapters.html">Adapters</a></li>
+          <li><a href="docs/attacks.html">Attack Modules</a></li>
+          <li><a href="docs/benchmarks.html">Benchmarks</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-links-title">Advanced</div>
+        <ul class="footer-links">
+          <li><a href="docs/guardrails.html">Guardrails</a></li>
+          <li><a href="docs/detectors.html">Detectors</a></li>
+          <li><a href="docs/mutations.html">Mutations</a></li>
+          <li><a href="docs/compliance.html">Compliance</a></li>
+          <li><a href="https://github.com/FilledVaccum/redforge">GitHub</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="footer-col">
-      <h4>Documentation</h4>
-      <ul>
-        <li><a href="docs/getting-started.html">Getting Started</a></li>
-        <li><a href="docs/installation.html">Installation</a></li>
-        <li><a href="docs/cli-reference.html">CLI Reference</a></li>
-        <li><a href="docs/python-sdk.html">Python SDK</a></li>
-        <li><a href="docs/configuration.html">Configuration</a></li>
-      </ul>
+    <div class="footer-bottom">
+      <span>© 2026 RedForge Contributors · Apache 2.0 License</span>
+      <span>Authorized testing only · Scan systems you own or have written permission to test</span>
     </div>
-    <div class="footer-col">
-      <h4>Reference</h4>
-      <ul>
-        <li><a href="docs/probes.html">Probe Catalog</a></li>
-        <li><a href="docs/api-reference.html">REST API</a></li>
-        <li><a href="docs/adapters.html">Adapters</a></li>
-        <li><a href="docs/attacks.html">Attack Modules</a></li>
-        <li><a href="docs/benchmarks.html">Benchmarks</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Advanced</h4>
-      <ul>
-        <li><a href="docs/guardrails.html">Guardrails</a></li>
-        <li><a href="docs/detectors.html">Detectors</a></li>
-        <li><a href="docs/mutations.html">Mutations</a></li>
-        <li><a href="docs/compliance.html">Compliance</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 RedForge Contributors · Apache 2.0 License</p>
-    <p style="color:var(--text-muted)">For authorized use only · Scan only systems you own or have written permission to test</p>
   </div>
 </footer>
 

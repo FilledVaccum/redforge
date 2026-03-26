@@ -1,137 +1,135 @@
-/* RedForge Website — Main JS */
+/* RedForge — main.js */
 
-// ── Tab switcher ─────────────────────────────────────────
-function initTabs() {
-  document.querySelectorAll('.tabs').forEach(tabGroup => {
-    tabGroup.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.tab;
-        const parent = btn.closest('.tab-container') || document;
-        tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        parent.querySelectorAll('.tab-pane').forEach(p => {
-          p.classList.toggle('active', p.id === target);
-        });
-      });
+// ── Tab switcher ──────────────────────────────────────────────
+document.querySelectorAll('.tabs-bar').forEach(bar => {
+  bar.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const target = btn.dataset.tab;
+    const container = bar.closest('.dark-section, .section, .docs-content, body');
+    bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    (container || document).querySelectorAll('.tab-panel').forEach(p => {
+      p.classList.toggle('active', p.id === target);
     });
   });
-}
-
-// ── Copy code ─────────────────────────────────────────────
-function initCopyButtons() {
-  document.querySelectorAll('.code-copy').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const block = btn.closest('.code-block');
-      const code = block ? block.querySelector('code') : null;
-      if (code) {
-        navigator.clipboard.writeText(code.textContent).then(() => {
-          btn.textContent = 'Copied!';
-          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-        });
-      }
-    });
-  });
-}
-
-// ── Sidebar active link ───────────────────────────────────
-function initSidebarActive() {
-  const current = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.sidebar-nav a').forEach(a => {
-    const href = a.getAttribute('href') || '';
-    if (href.includes(current) || (current === '' && href === 'index.html')) {
-      a.classList.add('active');
-    }
-  });
-}
-
-// ── Probe search filter ───────────────────────────────────
-function initProbeSearch() {
-  const searchInput = document.getElementById('probe-search');
-  if (!searchInput) return;
-  const cards = document.querySelectorAll('.probe-card');
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase();
-    cards.forEach(card => {
-      const text = card.textContent.toLowerCase();
-      card.style.display = text.includes(query) ? '' : 'none';
-    });
-  });
-}
-
-// ── Smooth scroll for anchor links ───────────────────────
-function initSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-}
-
-// ── Navbar scroll effect ──────────────────────────────────
-function initNavbar() {
-  const navbar = document.querySelector('.navbar');
-  if (!navbar) return;
-  window.addEventListener('scroll', () => {
-    navbar.style.boxShadow = window.scrollY > 10
-      ? '0 4px 24px rgba(0,0,0,0.4)'
-      : 'none';
-  });
-}
-
-// ── Mobile sidebar toggle ─────────────────────────────────
-function initMobileSidebar() {
-  const toggle = document.getElementById('sidebar-toggle');
-  const sidebar = document.querySelector('.docs-sidebar');
-  if (!toggle || !sidebar) return;
-  toggle.addEventListener('click', () => {
-    sidebar.style.display = sidebar.style.display === 'block' ? '' : 'block';
-  });
-}
-
-// ── Collapsible API endpoints ─────────────────────────────
-function initApiEndpoints() {
-  document.querySelectorAll('.api-endpoint-header').forEach(header => {
-    const body = header.nextElementSibling;
-    if (body && body.classList.contains('api-endpoint-body')) {
-      header.addEventListener('click', () => {
-        const isOpen = body.style.display !== 'none';
-        body.style.display = isOpen ? 'none' : 'block';
-        const arrow = header.querySelector('.api-arrow');
-        if (arrow) arrow.textContent = isOpen ? '›' : '⌄';
-      });
-    }
-  });
-}
-
-// ── Animate hero stats ────────────────────────────────────
-function animateStats() {
-  const stats = document.querySelectorAll('.stat-value[data-count]');
-  stats.forEach(el => {
-    const target = parseInt(el.dataset.count);
-    const suffix = el.dataset.suffix || '';
-    let current = 0;
-    const step = Math.ceil(target / 40);
-    const timer = setInterval(() => {
-      current = Math.min(current + step, target);
-      el.textContent = current + suffix;
-      if (current >= target) clearInterval(timer);
-    }, 30);
-  });
-}
-
-// ── Init ──────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
-  initCopyButtons();
-  initSidebarActive();
-  initProbeSearch();
-  initSmoothScroll();
-  initNavbar();
-  initMobileSidebar();
-  initApiEndpoints();
-  animateStats();
 });
+
+// ── Copy buttons ──────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.code-copy, .install-copy');
+  if (!btn) return;
+  const text = btn.dataset.copy ||
+    btn.closest('.code-block')?.querySelector('pre code')?.textContent || '';
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+});
+
+// ── Counter animation (stats) ─────────────────────────────────
+const counters = document.querySelectorAll('[data-target]');
+const countObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = +el.dataset.target;
+    const dur = 900;
+    const start = performance.now();
+    const tick = now => {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(ease * target);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    countObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => countObs.observe(c));
+
+// ── OWASP bar animation ───────────────────────────────────────
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('bar-ready');
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.owasp-cell').forEach(c => barObs.observe(c));
+
+// ── Scroll reveal ─────────────────────────────────────────────
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ── Staggered child reveals ───────────────────────────────────
+const staggerObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.querySelectorAll('.feat-cell, .owasp-cell').forEach((child, i) => {
+      child.style.transitionDelay = `${i * 0.04}s`;
+      child.style.opacity = '0';
+      child.style.transform = 'translateY(12px)';
+      child.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+      setTimeout(() => {
+        child.style.opacity = '1';
+        child.style.transform = 'translateY(0)';
+      }, i * 40);
+    });
+    staggerObs.unobserve(entry.target);
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.feat-grid, .owasp-grid').forEach(g => staggerObs.observe(g));
+
+// ── Sidebar active link (docs) ─────────────────────────────────
+const currentPath = location.pathname.split('/').pop();
+document.querySelectorAll('.sidebar-nav a').forEach(a => {
+  if (a.getAttribute('href') === currentPath ||
+      a.getAttribute('href')?.endsWith(currentPath)) {
+    a.classList.add('active');
+  }
+});
+
+// ── API endpoint accordion ────────────────────────────────────
+document.querySelectorAll('.endpoint-header').forEach(header => {
+  header.addEventListener('click', () => {
+    header.closest('.endpoint-block').classList.toggle('open');
+  });
+});
+
+// ── Probe search + filter (docs/probes.html) ──────────────────
+const searchInput = document.querySelector('.probe-search-input');
+const filterBtns  = document.querySelectorAll('.filter-btn');
+const probeCards  = document.querySelectorAll('.probe-card');
+
+function filterProbes() {
+  const q = searchInput?.value.toLowerCase() || '';
+  const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+  probeCards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const matchQ = !q || text.includes(q);
+    const matchF = activeFilter === 'all' || text.includes(activeFilter.toLowerCase());
+    card.style.display = (matchQ && matchF) ? '' : 'none';
+  });
+}
+
+searchInput?.addEventListener('input', filterProbes);
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterProbes();
+  });
+});
+
+// ── Navbar scroll shadow ──────────────────────────────────────
+const navbar = document.querySelector('.navbar');
+window.addEventListener('scroll', () => {
+  navbar?.classList.toggle('scrolled', window.scrollY > 8);
+}, { passive: true });
